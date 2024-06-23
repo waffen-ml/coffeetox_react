@@ -36,7 +36,7 @@ def react_assets(path_to_file):
 
 @app.route('/')
 @app.route('/register', methods=['GET'])
-@app.route('/confirm_email/<string:key>)', methods=['GET'])
+@app.route('/confirm_email/<string:key>', methods=['GET'])
 @app.route('/post/<string:id>')
 @app.route('/new_post', methods=['GET'])
 @app.route('/ua')
