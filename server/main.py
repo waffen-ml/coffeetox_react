@@ -25,6 +25,7 @@ app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = 'kheres'
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
+
 # shortcut
 @app.route('/assets/<path:path_to_file>')
 def react_assets(path_to_file):
@@ -35,7 +36,12 @@ def react_assets(path_to_file):
 
 @app.route('/')
 @app.route('/register', methods=['GET'])
-def send_page():
+@app.route('/confirm_email/<string:key>)', methods=['GET'])
+@app.route('/post/<string:id>')
+@app.route('/new_post', methods=['GET'])
+@app.route('/ua')
+@app.route('/capytaire')
+def send_page(*args):
     return send_file('./static/dist/index.html')
 
 @app.route('/is_tag_free')
