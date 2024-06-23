@@ -1,5 +1,5 @@
 import { useEffect, useState, useReducer, useRef, createContext, useContext } from "react";
-import { getRandomInt, shuffleArray } from "../utils";
+import { getRandomInt, shuffleArray, hostURL } from "../utils";
 import Button from '@mui/material/Button'
 
 
@@ -46,7 +46,7 @@ function loadCardTextures() {
             resolve(cardTextures)
         }
 
-        img.src = `http://localhost:5000/static/playing_cards/default/cards.png`
+        img.src = hostURL('static/playing_cards/default/cards.png')
     })
 }
 
@@ -317,7 +317,7 @@ function Cards({data, colidx}) {
             {data.map((card, i) => (
                 <div draggable="true" key={i} cardidx={i} colidx={colidx} className={"relative w-full shadow-sm " + (i + 1 == data.length? 'aspect-[3/5]' : 'aspect-[10/4]')}>
                     <div cardidx={i} colidx={colidx} className="absolute top-0 left-0 w-full aspect-[3/5] outline outline-1 rounded-md overflow-hidden">
-                    <img className="w-full h-full select-none pointer-events-none" src={card.flipped? 'http://localhost:5000/static/playing_cards/default/back.png' : getCardSrc(card.suit, card.rank)}/>
+                    <img className="w-full h-full select-none pointer-events-none" src={card.flipped? hostURL('/static/playing_cards/default/back.png') : getCardSrc(card.suit, card.rank)}/>
                     </div>
                 </div>
             ))}

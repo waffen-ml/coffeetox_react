@@ -1,5 +1,6 @@
 import {SimpleInput} from '../Components/Input'
 import Form from '../Components/Form'
+import { hostURL } from '../utils'
 
 export default function Register() {
 
@@ -29,7 +30,7 @@ export default function Register() {
         },
         validate: {
             is_free: (val) => {
-                return fetch('http://localhost:5000/is_tag_free?tag=' + val)
+                return fetch(hostURL('is_tag_free?tag=' + val))
                 .then(r => r.json()).then(r => {
                     if (!r.success)
                         throw Error('failed to check tag')
@@ -68,7 +69,7 @@ export default function Register() {
 
     const onSubmit = (data) => {
         console.log(data)
-        return fetch('http://localhost:5000/register', {
+        return fetch(hostURL('register'), {
             method: 'POST',
             credentials: 'same-origin',
             headers: {

@@ -1,5 +1,7 @@
 import {createContext} from 'react'
 
+export const HOST = 'http://45.95.202.245'
+
 export const cfxContext = createContext({
     inspectContent: () => {}
 })
@@ -113,6 +115,12 @@ export function getPostDatetimeLabel(datetime) {
     return getLocalizedDateLabel(datetime, true) + time
 }
 
+export function hostURL(path) {
+    if(path[0] == '/')
+        path = path.slice(1)
+    return HOST + '/' + path
+}
+
 export function fileURL(file_id) {
-    return `http://localhost:5000/file/${file_id}`
+    return hostURL('file/' + file_id)
 }

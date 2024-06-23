@@ -1,19 +1,20 @@
-from flask import Flask, request, session, send_file, Response
+from flask import Flask, request, session, send_file, Response, render_template, send_from_directory
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from flask_cors import CORS
-import uuid
 import email_confirmation
 import re
 import datetime
 import bcrypt
 import gridfs
+import mimetypes
+import os
 
 BCRYPT_SALT = 5
-MONGODB_ADDRESS = '45.95.202.245'
+VPS_ADDRESS = '45.95.202.245'
 
 try:
-    mongo_client = MongoClient(f'mongodb://{MONGODB_ADDRESS}:27017/')
+    mongo_client = MongoClient(f'mongodb://{VPS_ADDRESS}:27017/')
     db = mongo_client['coffeetox']
 except Exception as ex:
     print('There is an error with database:', ex)
@@ -23,6 +24,19 @@ fs = gridfs.GridFS(db, collection='fs')
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = 'kheres'
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
+
+# shortcut
+@app.route('/assets/<path:path_to_file>')
+def react_assets(path_to_file):
+    path = os.path.join('./static/dist/assets', path_to_file)
+    mimetype = 'text/javascript' if path_to_file.endswith('.js') else mimetypes.guess_type(path)[0]
+    return send_file(path, mimetype=mimetype)
+
+
+@app.route('/')
+@app.route('/register', methods=['GET'])
+def send_page():
+    return send_file('./static/dist/index.html')
 
 @app.route('/is_tag_free')
 def is_tag_free():
@@ -90,7 +104,6 @@ def new_post():
     })
 
     return {'success': 1}
-
 
 def get_file_metadata(file_id=None, file=None):
 
@@ -197,7 +210,6 @@ def get_post_json(post_id):
         'post': post
     }
 
-
 @app.route('/login', methods=['POST'])
 def login():
     pass
@@ -213,4 +225,4 @@ def get_all_posts():
     return {'success': 1, 'posts': posts}
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(host=VPS_ADDRESS, port=80, debug=True)

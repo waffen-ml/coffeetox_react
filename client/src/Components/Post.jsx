@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useContext } from 'react'
-import { fileURL, getPostDatetimeLabel, cfxContext } from '../utils'
+import { fileURL, getPostDatetimeLabel, cfxContext, hostURL } from '../utils'
 
 
 export default function Post({ id }) {
@@ -7,7 +7,7 @@ export default function Post({ id }) {
     const { inspectMedia } = useContext(cfxContext)
 
     useEffect(() => {
-        fetch(`http://localhost:5000/post/json/${id}?file_metadata=1`)
+        fetch(hostURL(`post/json/${id}?file_metadata=1`))
         .then(r => r.json()).then(r => {
             if (!r.success)
                 throw Error('failed to load the post')

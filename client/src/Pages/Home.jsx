@@ -1,11 +1,12 @@
 import Post from '../Components/Post'
 import { useEffect, useState } from 'react'
+import { hostURL } from '../utils'
 
 export default function Home(){
     const [posts, setPosts] = useState([])
 
     useEffect(() => {
-        fetch('http://localhost:5000/get_all_posts')
+        fetch(hostURL('get_all_posts'))
         .then(r => r.json())
         .then(r => {
             if (!r.success)

@@ -1,12 +1,12 @@
 import '../index.css'
 import Form from '../Components/Form'
 import { SimpleInput, SimpleMultipleFilesUploader, TextAreaInput } from '../Components/Input'
-import { jsonToFormData, trimMultilineText } from '../utils'
+import { hostURL, jsonToFormData, trimMultilineText } from '../utils'
 
 export default function NewPost() {
 
     const onSubmit = data => {
-        return fetch('http://localhost:5000/new_post', {
+        return fetch(hostURL('new_post'), {
             method: 'POST',
             body: jsonToFormData(data),
             credentials: 'same-origin'

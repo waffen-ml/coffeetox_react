@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom'
 import Form from '../Components/Form'
 import {SimpleInput} from '../Components/Input'
 import { useState } from 'react'
+import { hostURL } from '../utils'
 
 export default function ConfirmEmail() {
     const { confKey } = useParams()
@@ -16,7 +17,7 @@ export default function ConfirmEmail() {
     }
 
     const onSubmit = (data) => {
-        fetch('http://localhost:5000/confirm_email', {
+        fetch(hostURL('confirm_email'), {
             method: 'POST',
             credentials: 'same-origin',
             body: JSON.stringify({
