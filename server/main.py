@@ -41,7 +41,7 @@ def react_assets(path_to_file):
 @app.route('/new_post', methods=['GET'])
 @app.route('/ua')
 @app.route('/capytaire')
-def send_page(*args):
+def send_page(*args, **kwargs):
     return send_file('./static/dist/index.html')
 
 @app.route('/is_tag_free')
