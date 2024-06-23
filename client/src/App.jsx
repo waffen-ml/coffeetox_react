@@ -37,7 +37,7 @@ export default function App() {
             <Route path="/post/:id" element={<PostView/>} />
             <Route exact path="/" element={<Home/>} />
             <Route path="/ua" element={<CFXStandsWithUA/>} />
-            <Route path="/capytaire" element={<Capytaire nSuits={2} />} />
+            <Route path="/capytaire" element={<Capytaire nSuits={4} />} />
           </Routes>
         </Router>
       </div>
