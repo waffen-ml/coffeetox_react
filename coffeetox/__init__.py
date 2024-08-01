@@ -41,7 +41,12 @@ from coffeetox import email
 db.create_all()
 
 def run_coffeetox():
-    app.run(debug=True, port=80, host='localhost')
+    app.run(
+        debug=True,
+        port=cfx_config['port'],
+        host=cfx_config['host_url'],
+        ssl_context=('ssl/cert.pem', 'ssl/key.pem')
+    )
 
 
 
