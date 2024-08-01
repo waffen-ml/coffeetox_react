@@ -86,10 +86,8 @@ class User(db.Model, UserMixin):
         }
 
         if full:
-            out |= {
-                'email': self.email
-            }
-
+            out['email'] = self.email
+            
         return out
     
     def subscribe_to(self, user):
