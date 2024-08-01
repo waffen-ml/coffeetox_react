@@ -45,7 +45,7 @@ def run_coffeetox():
         debug=True,
         port=cfx_config['port'],
         host=cfx_config['host_url'],
-        ssl_context=('ssl/cert.pem', 'ssl/key.pem')
+        #ssl_context=('ssl/cert.pem', 'ssl/key.pem')
     )
 
 
