@@ -72,7 +72,6 @@ export default function Capytaire({ nSuits }) {
     const draggedStackRef = useRef(null)
     const [moves, setMoves] = useState([])
 
-
     useEffect(() => {
         const allCards = []
         const columns = []
@@ -99,6 +98,7 @@ export default function Capytaire({ nSuits }) {
             setColumns(columns)
             setRemainCards(allCards)
         })
+
     }, [])
 
     const addMove = (...events) => {
@@ -131,6 +131,8 @@ export default function Capytaire({ nSuits }) {
     const handleMouseMove = (e) => {
         if(!currentlyDragged)
             return
+
+        //console.log(e)
 
         draggedStackRef.current.style.top = (e.clientY - currentlyDragged.offsetY) + 'px'
         draggedStackRef.current.style.left = (e.clientX - currentlyDragged.offsetX) + 'px'
@@ -276,23 +278,37 @@ export default function Capytaire({ nSuits }) {
         deleteLastMove()
     }
 
+    useEffect(() => {
+        addEventListener('mousemove', handleMouseMove)
+        addEventListener('mouseup', handleMouseUp)
+        document.body.addEventListener('mouseleave', handleMouseLeave)
+        addEventListener('keydown', handleCtrlZ)
+
+        return () => {
+            removeEventListener('mousemove', handleMouseMove)
+            removeEventListener('mouseup', handleMouseUp)
+            document.body.removeEventListener('mouseleave', handleMouseLeave)
+            removeEventListener('keydown', handleCtrlZ)
+        }
+    })
+
     if (!columns || !cardTextures)
         return <div>loading...</div>
 
     return (
         <cardTextureContext.Provider value={getCardSrc}>
-            <div className="min-h-[300px] mb-10" tabIndex="0" onKeyDown={handleCtrlZ} onMouseLeave={handleMouseLeave} onMouseUp={handleMouseUp} onMouseMove={handleMouseMove} onDragStart={handleDragStart}>
+            <div className="min-h-[300px] mb-10" tabIndex="0" onDragStart={handleDragStart}>
                 
                 <div className="flex gap-1">
                     {columns.map((c, i) => <Column idx={i} cards={c} key={i}/>)}
                 </div>
-                
-                {currentlyDragged && (
-                    <div ref={draggedStackRef} className="flex flex-col shadow-lg" style={{width:`${currentlyDragged.width}px`, position:'absolute', 'pointerEvents': 'none'}}>
-                        <Cards data={currentlyDragged.cards} colidx={-1}/>
-                    </div>
-                )}
             </div>
+
+            {currentlyDragged && (
+                <div ref={draggedStackRef} className="absolute flex flex-col shadow-lg z-50 pointer-events-none" style={{width:`${currentlyDragged.width}px`}}>
+                    <Cards data={currentlyDragged.cards} colidx={-1}/>
+                </div>
+            )}
 
             {remainCards.length > 0 && (
                 <Button variant="contained" onClick={giveCards}>Give cards ({Math.ceil(remainCards.length / 10)} remain)</Button>

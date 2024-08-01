@@ -1,49 +1,197 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import NewPost from './Pages/NewPost'
 import PostView from './Pages/PostView'
-import MediaInspector from './Components/MediaInspector'
 import Home from './Pages/Home'
 import CFXStandsWithUA from './Pages/CFXStandsWithUA'
 import Register from './Pages/Register'
 import ConfirmEmail from './Pages/ConfirmEmail'
 import Capytaire from './Pages/Capytaire'
-import { cfxContext } from './utils'
-import { useState } from 'react'
+import Login from './Pages/Login'
+import User from './Pages/User'
+import Subscriptions from './Pages/Subscriptions'
+import ResetPassword from './Pages/ResetPassword'
+import ResetPasswordResult from './Pages/ResetPasswordResult'
+import ChangePassword from './Pages/ChangePassword'
+import AccountSettings from './Pages/AccountSettings'
+import { cfxContext, hostURL, fileURL } from './utils'
+import { useEffect, useState, useRef} from 'react'
+import SetAvatar from './Pages/SetAvatar'
+import FormattedTextTest from './Pages/FormattedTextTest'
+import MyFileUploaderTest from './Pages/MyFileUploaderTest'
+import { AvatarTagWidget } from './Components/UserWidgets'
+import LogoutIcon from '@mui/icons-material/Logout';
+import MenuIcon from '@mui/icons-material/Menu';
+import { Avatar, Link, Button, IconButton, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box} from '@mui/material'
 
 
 export default function App() {
-  const [inspectedMedia, inspectMedia] = useState(null)
+    const [currentUser, setCurrentUser] = useState(null)
+    const [sideMenuOpen, toggleSideMenu] = useState(false)
+    const mainContentRef = useRef(null)
 
-  return (
-    <cfxContext.Provider value={{inspectMedia}}>
-      <div className="bg-gray-200 w-full h-[55px] shadow-sm">
-        <div className="w-[700px] max-w-full h-full mx-auto flex justify-between items-center">
-          <a href="/" className="text-2xl">
-            🏳️‍🌈tox
-          </a>
-          <ul className="flex gap-3 text-base">
-            <li><a href="/ua">CoffeeTox stands with 🇺🇦</a></li>
-            <li><a href="/">Новости</a></li>
-            <li><a href="/new_post">Создать пост</a></li>
-          </ul>
-        </div>
-      </div>
-      <div className="w-[700px] max-w-full mx-auto mt-3">
-        <Router>
-          <Routes>
-            <Route path="/register" element={<Register/>}/>
-            <Route path="/confirm_email/:confKey" element={<ConfirmEmail/>}/>
-            <Route exact path="/new_post"  element={<NewPost/>}/>
-            <Route path="/post/:id" element={<PostView/>} />
-            <Route exact path="/" element={<Home/>} />
-            <Route path="/ua" element={<CFXStandsWithUA/>} />
-            <Route path="/capytaire" element={<Capytaire nSuits={4} />} />
-          </Routes>
-        </Router>
-      </div>
+    const updateUserData = () => {
+        return fetch(hostURL('/who_am_i'), {credentials:'include'})
+        .then(r => r.json())
+        .then(r => {
+            if (!r.success)
+                throw Error()
+            setCurrentUser(r.you)
+        })
+        .catch(() => setCurrentUser({ id: -1 }))
+    }
 
-      {inspectedMedia && <MediaInspector files={inspectedMedia.files} at={inspectedMedia.at}/>}
-    </cfxContext.Provider>
-  )
+    const logout = () => {
+        return fetch(hostURL('/logout'), {credentials: 'include'})
+        .then(r => r.json())
+        .then(r => {
+            if(!r.success)
+                throw Error()
+            location.reload()
+        })
+        .catch(() => {
+            alert('Не удалось выйти из аккаунта.')
+        })
+    }
+
+    useEffect(() => {
+        updateUserData()
+    }, [])
+
+
+    return (
+        <cfxContext.Provider value={{ currentUser, updateUserData, mainContentRef }}>
+
+            <div className="absolute top-0 left-0 w-full h-[55px] shadow-sm bg-gray-200 z-[-1]"></div>
+
+            <div className="w-[768px] max-w-full box-border mx-auto grid grid-cols-[auto_1fr] grid-rows-[auto_1fr] gap-y-3 gap-x-8 h-dvh">
+                
+                <div className="w-full h-[55px] px-2 md:px-0 col-span-2 flex items-center gap-5 justify-between overflow-hidden">
+                    <a href="/" className="text-2xl whitespace-nowrap">
+                        ☕tox
+                    </a>
+
+                    {/* Mobile version */}
+                    <div className="md:hidden">
+                        <IconButton onClick={() => toggleSideMenu(true)}><MenuIcon/></IconButton>
+                    </div>
+
+                    {/* Desktop version */}
+                    <div className="hidden md:block">
+                        <div className="flex gap-2 items-center">
+                            {currentUser && currentUser.id > 0 && (
+                                <>
+                                    <AvatarTagWidget user={currentUser} reverse={true} />
+                                    <IconButton onClick={logout}><LogoutIcon/></IconButton>
+                                </>
+                            )}
+                            {currentUser && currentUser.id < 0 && (
+                                <Button href="/login">Войти</Button>
+                            )}
+                        </div>
+                    </div>
+
+                </div>
+
+                <div className="hidden md:block">
+                    <ul className="">
+                        <li><Link href="/">Новости</Link></li>
+                        <li><Link href="/?subscribed_only=1">Подписки</Link></li>
+                        <li><Link href="/new_post">Создать пост</Link></li>
+                        <li><Link href="/capytaire">Каписьянс</Link></li>
+                    </ul>
+                </div>
+
+                <div ref={mainContentRef} className="w-full h-full px-2 md:p0-0 md:pr-1 overflow-x-hidden overflow-y-auto col-span-2 md:col-span-1">
+                    <Router>
+                        <Routes>
+                            <Route path="/user/:tag" element={<User/>} />
+                            <Route path="/register" element={<Register />} />
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/confirm_email/:confKey" element={<ConfirmEmail />} />
+                            <Route exact path="/new_post" element={<NewPost />} />
+                            <Route path="/post/:id" element={<PostView />} />
+                            <Route exact path="/" element={<Home />} />
+                            <Route path="/ua" element={<CFXStandsWithUA />} />
+                            <Route path="/capytaire" element={<Capytaire nSuits={4} />} />
+                            <Route path="/set_avatar" element={<SetAvatar />} />
+                            <Route path="/change_password" element={<ChangePassword/>} />
+                            <Route path="/account_settings" element={<AccountSettings/>} />
+                            <Route path="/ft_test" element={<FormattedTextTest/>} />
+                            <Route path="/fupl_test" element={<MyFileUploaderTest/>} />
+                            <Route path="/reset_password_start" element={<ResetPassword/>}/>
+                            <Route path="/reset_password_result" element={<ResetPasswordResult/>}/>
+                            <Route path="/subscriptions" element={<Subscriptions/>}/>
+                        </Routes>
+                    </Router>
+                </div>
+
+            </div>
+
+            <Drawer
+                open={sideMenuOpen}
+                onClose={() => toggleSideMenu(false)}
+                anchor="right"
+            >   
+                <div className="min-w-[200px]">
+                    {currentUser && currentUser.id > 0 && (
+                        <>
+                            <div className="p-2">
+                                <AvatarTagWidget user={currentUser}/>
+                            </div>
+                            <Divider/>
+                        </>
+                    )}
+    
+                    <List>
+                        {currentUser && currentUser.id < 0 && (
+                        <ListItem>
+                            <ListItemButton href="/login">
+                                <ListItemText>
+                                    Войти
+                                </ListItemText>
+                            </ListItemButton>
+                        </ListItem>     
+                        )}
+
+                        <ListItem>
+                            <ListItemButton href="/">
+                                <ListItemText>
+                                    Новости
+                                </ListItemText>
+                            </ListItemButton>
+                        </ListItem>
+
+                        <ListItem>
+                            <ListItemButton href="/?subscribed_only=1">
+                                <ListItemText>
+                                    Подписки
+                                </ListItemText>
+                            </ListItemButton>
+                        </ListItem>
+
+                        <ListItem>
+                            <ListItemButton href="/new_post">
+                                <ListItemText>
+                                    Создать пост
+                                </ListItemText>
+                            </ListItemButton>
+                        </ListItem>
+
+                        {currentUser && currentUser.id > 0 && (
+                            <ListItem>
+                                <ListItemButton onClick={logout}>
+                                    <ListItemText>
+                                        Выйти
+                                    </ListItemText>
+                                </ListItemButton>
+                            </ListItem>
+                        )}
+                    </List>
+                </div>
+
+            </Drawer>
+
+        </cfxContext.Provider>
+    )
 
 }

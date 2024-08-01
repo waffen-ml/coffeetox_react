@@ -1,0 +1,14 @@
+{
+    "generated_password_length": 10,
+    "feed_limit": 4,
+    "email_confirmation": true,
+    "bcrypt_salt": 5,
+    "vps_address": "45.95.202.245",
+    "vps": false,
+    "secret_key": "kheres",
+    "built_react_app_folder": "react_build",
+    "email_sender": "mrkostinilya@gmail.com",
+    "email_app_pw": "ogql qywh ialc sfpk",
+    "email_conf_lifetime_minutes": 5,
+    "user_files_folder": "user_files"
+}

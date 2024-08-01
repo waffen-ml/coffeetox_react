@@ -1,26 +1,56 @@
-import { useFormContext } from "react-hook-form"
+import { useFormContext, Controller, useController } from "react-hook-form"
 import { findInputError, isFormInvalid } from "../utils"
 import { useState, useRef, useEffect } from 'react'
-
+import {Link, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Checkbox, FormControlLabel} from '@mui/material'
+import FormattedText from "./FormattedText"
 
 export const SimpleInput = ({label, type, name, placeholder, validation}) => {
-    const { register } = useFormContext()
+    const { control } = useFormContext()
+    const {field} = useController({
+        name, control,
+        rules: validation,
+        defaultValue: ''
+    })
 
     return (
         <InputWrapper label={label} name={name}>
             <input
                 className="w-full p-5 font-medium border rounded-md border-slate-300 placeholder:opacity-60" 
                 type={type}
-                name={name}
                 placeholder={placeholder}
-                {...register(name, validation ?? {})}
+                {...field}
             />
         </InputWrapper>
     )
 }
 
+export const CheckboxInput = ({name, label}) => {
+    const { control } = useFormContext()
+    const {field} = useController({
+        name, control,
+        defaultValue: false
+    })
+
+    return (
+        <FormControlLabel
+            control={
+                <Checkbox
+                    {...field}
+                    checked={field.value}
+                />
+            }
+            label={label}
+        />
+    )
+}
+
 export const TextAreaInput = ({label, name, placeholder, validation}) => {
-    const {register} = useFormContext()
+    const { control } = useFormContext()
+    const {field} = useController({
+        name, control,
+        rules: validation,
+        defaultValue: ''
+    })
 
     return (
         <InputWrapper label={label} name={name}>
@@ -28,96 +58,59 @@ export const TextAreaInput = ({label, name, placeholder, validation}) => {
                 className="w-full p-5 font-medium border rounded-md border-slate-300 placeholder:opacity-60" 
                 name={name}
                 placeholder={placeholder}
-                {...register(name, validation ?? {})}
+                {...field}
             >
             </textarea>
         </InputWrapper>
     )
-
 }
 
-export const SimpleMultipleFilesUploader = ({label, name, required, maxFiles, maxSizeMB}) => {
-    const {register, setValue} = useFormContext()
-    const [files, setFiles_] = useState([])
-
-    useEffect(() => {
-        setValue(name, [])
-    }, [])
-
-    register(name, {
-        validate: {
-            'file_limit_exceeded': (val) => !maxFiles || val.length <= maxFiles || `Превышен лимит в ${maxFiles} файлов`,
-            'no_files': (val) => !required || val.length > 0 || 'Нужен хотя бы один файл',
-            'memory_limit_exceeded': (val) => {
-                let s = 0
-                val.forEach(v => s += v.size / 1024 / 1024)
-                return !maxSizeMB || s <= maxSizeMB || `Превышен лимит памяти в ${maxSizeMB}МБ`
-            }
-        }
-    })
-
-    const setFiles = (files_) => {
-        setValue(name, files_)
-        setFiles_(files_)
-    }
-
-    const addFiles = (newFiles) => {
-        setFiles(files.concat(newFiles))
-    }
-
-    const onDragOver = (e) => {
-        e.stopPropagation()
-        e.preventDefault()
-    }
-
-    const onDragLeave = (e) => {
-    }
-
-    const onDrop = (e) => {
-        e.stopPropagation()
-        e.preventDefault()
-        addFiles([...e.dataTransfer.files])
-    }
-
-    const deleteFile = (i) => {
-        setFiles(files.slice(0, i).concat(files.slice(i + 1)))
-    }
-
-    const browseFiles = () => {
-        const inp = document.createElement('input')
-        inp.type = 'file'
-        inp.multiple = true
-        inp.addEventListener('change', () => {
-            addFiles([...inp.files])
-        })
-        inp.click()
-    }
+export function FormattedTextInput({label, name, placeholder, renderAttachments, validation}) {
+    const [isPreviewOpen, togglePreview] = useState(false)
+    const {getValues} = useFormContext()
 
     return (
-        <InputWrapper label={label} name={name}>
-            <div className="font-medium bg-gray-300 w-full p-3 rounded-md dragover:bg-gray-500" onDrop={onDrop} onDragOver={onDragOver} onDragLeave={onDragLeave} >
-                <ul>
-                    {files.map((f, i) => <li key={i}>{f.name}  <a href="#" onClick={() => deleteFile(i)}>Удалить</a></li>)}
-                </ul>
-                <a href="#" onClick={browseFiles}>Добавить файлы</a>
+        <>
+            <div className="flex flex-col gap-1 items-start w-full">
+                <TextAreaInput name={name} label={label} placeholder={placeholder} validation={validation}/>
+                <Link component="button" onClick={() => togglePreview(true)} underline="hover">Предпросмотр</Link>
             </div>
-        </InputWrapper>
+
+            <Dialog
+                open={isPreviewOpen}
+                onClose={() => togglePreview(false)}
+            >
+                <DialogTitle>Предпросмотр</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        <FormattedText
+                            text={getValues(name)}
+                            renderAttachments={renderAttachments}/>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => togglePreview(false)}>Закрыть</Button>
+                </DialogActions>
+            </Dialog>
+        </>
     )
+
 }
 
-
-const InputWrapper = ({name, label, children}) => {
+export function InputWrapper({name, label, children}) {
     const { formState: { errors } } = useFormContext()
     const inputError = findInputError(errors, name)
     const isInvalid = isFormInvalid(inputError)
 
     return (
         <div className="flex flex-col w-full gap-2">
-            <div className="flex justify-between">
-                <span className="font-semibold capitalize">
-                    {label}
-                </span>
-            </div>
+            {label && (
+                <div className="flex justify-between">
+                    <span className="font-semibold capitalize">
+                        {label}
+                    </span>
+                </div>
+            )}
             {children}
             {isInvalid && <span className="w-full red-800 font-medium font-semibold">{inputError.error.message}</span>}
         </div>
