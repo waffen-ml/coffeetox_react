@@ -24,8 +24,8 @@ app.app_context().push()
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{get_abspath("coffeetox.db")}?charset=utf8mb4'
 app.config['SECRET_KEY'] = cfx_config.secret_key
 app.config['MAX_CONTENT_LENGTH'] = 40 * 1024 * 1024
-app.config["SESSION_COOKIE_SAMESITE"] = "None"
-app.config["SESSION_COOKIE_SECURE"] = True
+#app.config["SESSION_COOKIE_SAMESITE"] = "None"
+#app.config["SESSION_COOKIE_SECURE"] = True
 cors = CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 db = SQLAlchemy(app)

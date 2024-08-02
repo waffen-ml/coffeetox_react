@@ -339,8 +339,8 @@ def generate_feed():
 def feed_batch(feed_id):
     amount = int(request.args.get('amount', 10))
 
+
     if 'feed' not in session or feed_id not in session['feed']:
-        print('NOT FOUND')
         return {
             'success': 0,
             'error': 'FEED_NOT_FOUND'
@@ -349,7 +349,6 @@ def feed_batch(feed_id):
     feed = session['feed'][feed_id]
 
     if feed.get('created_by_user_id') != current_user.id:
-        print('NOT CURRENT')
         return {
             'success': 0,
             'error': 'CURRENT_USER_WAS_CHANGED'
