@@ -19,7 +19,7 @@ const unaryOperators = [
         transform: () => <br/>
     },
     {
-        regex: '\@([a-z0-9_]*)',
+        regex: '\@([A-Za-z0-9_]*)\b',
         transform: (m) => {
             return <Link href={`/user/${m[1]}`} target="_blank">@{m[1]}</Link>
         }
@@ -253,7 +253,7 @@ export default function FormattedText({ title, text, renderAttachments, children
     return (
         <ftContext.Provider value={{addAttachment}}>
             <div className="w-full">
-                {title && <h2 className="text-2xl font-bold mt-0">{title}</h2>}
+                {title && <h2 className="text-2xl font-bold mt-0 mb-1">{title}</h2>}
                 <p className="w-full">
                     {children}
                     <ProcessTagsRec text={text} i={0} j={text.length - 1} insideTags={tags} tag={null}/>
