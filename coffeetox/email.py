@@ -6,9 +6,21 @@ import uuid
 import datetime
 from coffeetox import cfx_config
 
-context = ssl.create_default_context()
-smtp = smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context)
-smtp.login(cfx_config.email_sender, cfx_config.email_app_pw)
+def send_email(to_email, subject='', content=''):
+    context = ssl.create_default_context()
+    smtp = smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context)
+    smtp.login(cfx_config.email_sender, cfx_config.email_app_pw)
+
+    email = EmailMessage()
+    email['From'] = cfx_config.email_sender
+    email['To'] = to_email
+    email['Subject'] = subject
+    email.set_content(content)
+    
+    smtp.sendmail(cfx_config.email_sender, to_email, email.as_string())
+
+    smtp.quit()
+
 
 class EmailConfirmationManager:
     def __init__(self):
@@ -25,25 +37,12 @@ class EmailConfirmationManager:
         confirmation_key = uuid.uuid4().hex
         confirmation_code = random.randint(10**5, 10**6 - 1)
 
-        email = EmailMessage()
-        email['From'] = cfx_config.email_sender
-        email['To'] = email_address
-        email['Subject'] = 'Подтверждение адреса почты'
-        email.set_content(f'Код подтверждения: {confirmation_code}\nПокажите его всем, кому сможете!\nОн просрочится через {cfx_config.email_conf_lifetime_minutes} минут.')
+        send_email(
+            email_address,
+            subject='Подтверждение адреса почты',
+            content=f'Код подтверждения: {confirmation_code}\nПокажите его всем, кому сможете!\nОн просрочится через {cfx_config.email_conf_lifetime_minutes} минут.'
+        )
 
-        attempts = 5
-
-        while attempts > 0:
-            try:
-                smtp.sendmail(cfx_config.email_sender, email_address, email.as_string())
-            except smtplib.SMTPServerDisconnected:
-                smtp.connect()
-            else:
-                break
-            attempts -= 1
-        else:
-            raise Exception('Could not send email after multiple attempts')
-        
         self.confirmations[confirmation_key] = {
             'type': type,
             'confirmation_code': confirmation_code,
