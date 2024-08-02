@@ -1,13 +1,14 @@
 
 
 
-export function PSWP_obj({src, width, height, isVideo, innersx, outersx}) {
+export function PSWP_obj({src, width, height, isVideo, isCropped, innersx, outersx}) {
     return (
         <a
             href={src}
             data-pswp-width={width}
             data-pswp-height={height}
             data-pswp-type={isVideo? 'video': ''}
+            data-cropped={isCropped? "true" : "false"}
             target="_blank"
             className="w-full h-full block"
             style={outersx}

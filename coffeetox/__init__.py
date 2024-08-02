@@ -24,8 +24,11 @@ app.app_context().push()
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{get_abspath("coffeetox.db")}?charset=utf8mb4'
 app.config['SECRET_KEY'] = cfx_config.secret_key
 app.config['MAX_CONTENT_LENGTH'] = 40 * 1024 * 1024
-#app.config["SESSION_COOKIE_SAMESITE"] = "None"
-#app.config["SESSION_COOKIE_SECURE"] = True
+
+if cfx_config.vite_dev:
+    app.config["SESSION_COOKIE_SAMESITE"] = "None"
+    app.config["SESSION_COOKIE_SECURE"] = True
+
 cors = CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 db = SQLAlchemy(app)
@@ -41,14 +44,20 @@ from coffeetox import email
 db.create_all()
 
 def run_coffeetox():
+    
+    ssl_context = None
+
+    if cfx_config.ssl:
+        ssl_context = (
+            get_abspath('ssl/fullchain.pem'),
+            get_abspath('ssl/privkey.pem')
+        )
+
     app.run(
         debug=True,
         port=cfx_config['port'],
         host=cfx_config['host_url'],
-        ssl_context=(
-            get_abspath('ssl/fullchain.pem'),
-            get_abspath('ssl/privkey.pem')
-        )
+        ssl_context=ssl_context
     )
 
 

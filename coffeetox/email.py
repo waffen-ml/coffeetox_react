@@ -38,7 +38,18 @@ class EmailConfirmationManager:
         email['Subject'] = 'Подтверждение адреса почты'
         email.set_content(f'Код подтверждения: {confirmation_code}\nПокажите его всем, кому сможете!\nОн просрочится через {cfx_config.email_conf_lifetime_minutes} минут.')
 
-        smtp.sendmail(cfx_config.email_sender, email_address, email.as_string())
+        attempts = 5
+
+        while attempts > 0:
+            try:
+                smtp.sendmail(cfx_config.email_sender, email_address, email.as_string())
+            except smtplib.SMTPServerDisconnected:
+                smtp.connect()
+            else:
+                break
+            attempts -= 1
+        else:
+            raise Exception('Could not send email after multiple attempts')
 
         return confirmation_key
 

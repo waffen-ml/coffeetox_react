@@ -15,6 +15,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FormattedText from './FormattedText.jsx';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import {PSWP_obj} from "./Pswp.jsx"
 
 import PhotoSwipeVideoPlugin from '../photoswipe-video-plugin.esm.js';
 import PhotoSwipeLightbox from 'photoswipe/lightbox';
@@ -46,22 +47,6 @@ const N_THREADS_SORT_AVAILABLE = 10
 
 */
 
-function PSWP_obj({src, width, height, isVideo, innersx, outersx}) {
-    return (
-        <a
-            href={src}
-            data-pswp-width={width}
-            data-pswp-height={height}
-            data-pswp-type={isVideo? 'video': ''}
-            target="_blank"
-            className="w-full h-full block"
-            style={outersx}
-        >
-            {!isVideo && <img className="w-full h-full" style={innersx} src={src} alt="" />}
-            {isVideo && <video className="w-full h-full" style={innersx} src={src} preload="metadata"></video>}
-        </a>
-    )
-}
 
 function PostVisualFiles({files, isCompact}) {
     const [metadata, setMetadata] = useState(null)
@@ -171,10 +156,12 @@ function PostVisualFiles({files, isCompact}) {
                         height={w.imageSize[0].height}
                         isVideo={false}
                         innersx={{
-                            width: '100%',
-                            height: 'auto',
+                            width: "auto",
+                            height: "auto",
+                            maxWidth: "100%",
                             maxHeight: isCompact? '300px' : '450px',
-                            objectFit: 'contain'
+                            marginLeft: 'auto',
+                            marginRight: 'auto'
                         }}
                     />
                 )}
@@ -204,6 +191,7 @@ function PostVisualFiles({files, isCompact}) {
                         width={w.imageSize[i].width}
                         height={w.imageSize[i].height}
                         isVideo={false}
+                        isCropped={true}
                         innersx={{
                             objectFit: 'cover',
                             background: 'grey'
@@ -221,6 +209,7 @@ function PostVisualFiles({files, isCompact}) {
                         width={w.videoSize[i].width}
                         height={w.videoSize[i].height}
                         isVideo={true}
+                        isCropped={true}
                         innersx={{
                             objectFit: 'cover',
                             background: 'grey'

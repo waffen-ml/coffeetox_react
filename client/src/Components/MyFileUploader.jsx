@@ -106,10 +106,10 @@ function FileBar({ file, playAudio, deleteFile, editImage}) {
 
             <div className="row-span-2 w-[50px] h-full overflow-hidden flex items-center justify-center bg-gray-300 rounded-lg">
                 {f.primitiveType == 'image' && (
-                    <PSWP_obj src={f.currentBase64} width={f.currentWidth} height={f.currentHeight} isVideo={false} innersx={{'objectFit': 'cover'}}/>
+                    <PSWP_obj src={f.currentBase64} width={f.currentWidth} height={f.currentHeight} isVideo={false} isCropped={true} innersx={{'objectFit': 'cover'}}/>
                 )}
                 {f.primitiveType == 'video' && (
-                    <PSWP_obj src={f.currentBase64} width={f.currentWidth} height={f.currentHeight} isVideo={true} innersx={{'objectFit': 'cover'}}/>
+                    <PSWP_obj src={f.currentBase64} width={f.currentWidth} height={f.currentHeight} isVideo={true} isCropped={true} innersx={{'objectFit': 'cover'}}/>
                 )}
                 {f.primitiveType == 'audio' && (
                     <AudioFileIcon
