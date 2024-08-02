@@ -51,7 +51,6 @@ class EmailConfirmationManager:
             'datetime': datetime.datetime.now()
         }
         
-
         return confirmation_key
 
     def complete_confirmation(self, key, code):
