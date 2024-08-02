@@ -29,7 +29,7 @@ class EmailConfirmationManager:
     def remove_old_confirmations(self):
         now = datetime.datetime.now()
 
-        for k, v in self.confirmations.items():
+        for k, v in list(self.confirmations.items()):
             if (now - v['datetime']).seconds / 60 > cfx_config.email_conf_lifetime_minutes:
                 del self.confirmations[k]
 
@@ -68,7 +68,7 @@ class EmailConfirmationManager:
     def is_tag_about_to_be_registered(self, tag):
         self.remove_old_confirmations()
 
-        for k, v in self.confirmations.items():
+        for k, v in list(self.confirmations.items()):
             if v['type'] == 'register' and v['payload']['tag'] == tag:
                 return True
             
