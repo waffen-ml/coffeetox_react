@@ -19,7 +19,7 @@ const unaryOperators = [
         transform: () => <br/>
     },
     {
-        regex: '\@([A-Za-z0-9_]*)\b',
+        regex: '\@([A-Za-z0-9_]*)(?=\n|\ |$)',
         transform: (m) => {
             return <Link href={`/user/${m[1]}`} target="_blank">@{m[1]}</Link>
         }

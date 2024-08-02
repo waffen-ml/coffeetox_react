@@ -423,10 +423,10 @@ function PostCommentThread({main, comments, nShownComments, manager}) {
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
-                <a href={userURL(main.author)} target="_blank" className="row-start-1 row-end-4">
+                <a href={userURL(main.author)} className="row-start-1 row-end-4">
                     <Avatar src={fileURL(main.author.avatar_file_id)}/>
                 </a>
-                <Link href={userURL(main.author)} target="_blank" underline="hover">{main.author.username}</Link>
+                <Link href={userURL(main.author)} underline="hover">{main.author.username}</Link>
                 
                 <FormattedText text={main.text} renderAttachments={false}>
                     {main.replyTo && main.replyTo.threadMain != main.replyTo && (
