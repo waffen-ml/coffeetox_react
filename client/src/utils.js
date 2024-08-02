@@ -1,6 +1,6 @@
 import {createContext} from 'react'
 
-export const HOST = 'http://45.90.218.107' //'http://localhost' //'http://45.95.202.245'
+export const HOST = 'https://45.90.218.107' //'http://localhost' //'http://45.95.202.245'
 
 export const cfxContext = createContext({
     inspectContent: () => {}
