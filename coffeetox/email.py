@@ -50,6 +50,7 @@ class EmailConfirmationManager:
             'payload': payload,
             'datetime': datetime.datetime.now()
         }
+        
 
         return confirmation_key
 
