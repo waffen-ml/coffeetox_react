@@ -25,13 +25,6 @@ class EmailConfirmationManager:
         confirmation_key = uuid.uuid4().hex
         confirmation_code = random.randint(10**5, 10**6 - 1)
 
-        self.confirmations[confirmation_key] = {
-            'type': type,
-            'confirmation_code': confirmation_code,
-            'payload': payload,
-            'datetime': datetime.datetime.now()
-        }
-
         email = EmailMessage()
         email['From'] = cfx_config.email_sender
         email['To'] = email_address
@@ -50,6 +43,13 @@ class EmailConfirmationManager:
             attempts -= 1
         else:
             raise Exception('Could not send email after multiple attempts')
+        
+        self.confirmations[confirmation_key] = {
+            'type': type,
+            'confirmation_code': confirmation_code,
+            'payload': payload,
+            'datetime': datetime.datetime.now()
+        }
 
         return confirmation_key
 
