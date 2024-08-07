@@ -87,6 +87,9 @@ class Post(db.Model):
 
         self.is_deleted = True
 
+        if self.poll:
+            db.session.delete(self.poll)
+
         db.session.commit()
     
     def to_dict(self, me=None):

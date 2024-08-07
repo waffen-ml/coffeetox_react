@@ -84,7 +84,7 @@ class Poll(db.Model):
 
     def to_dict(self, me=None):
         my_vote = None if me is None else self.get_user_vote(me)
-        my_vote_id = None if my_vote is None else my_vote.id
+        my_vote_id = None if my_vote is None else my_vote.option_id
 
         return {
             'options': [
