@@ -3,19 +3,19 @@ import {hostURL, quickFetch} from '../utils'
 import InfiniteScroll from 'react-infinite-scroller';
 import Post from './Post'
 
-const FEED_LOAD_BATCH = 6
+const FEED_LOAD_BATCH = 3
 
 export default function Feed({ sort, subscribedOnly, specificUserOnly}) {
     const [feedId, setFeedId] = useState(null)
-    const [reachedEnd, setReachedEnd] = useState(false)
+    const [hasMore, setHasMore] = useState(true)
     const [endMessage, setEndMessage] = useState(null)
     const [posts, setPosts] = useState([])
 
     const loadPosts = (amount) => {
-        if(!feedId || reachedEnd)
+        if(!feedId || !hasMore)
             return
 
-        return quickFetch('feed_batch/' + feedId, {amount})
+        return quickFetch('/feed_batch/' + feedId, {amount})
         .then(r => {
             if(!r.success)
                 throw Error()
@@ -23,7 +23,7 @@ export default function Feed({ sort, subscribedOnly, specificUserOnly}) {
             const numLoaded = r.posts.length
 
             if (numLoaded < amount) {
-                setReachedEnd(true)
+                setHasMore(false)
                 setEndMessage('На этом все.')
             }
 
@@ -31,7 +31,7 @@ export default function Feed({ sort, subscribedOnly, specificUserOnly}) {
         })
         .catch(() => {
             console.log('FEED ERROR!')
-            setReachedEnd(true)
+            setHasMore(false)
             setEndMessage('Произошла ошибка.')
         })
     }
@@ -53,7 +53,7 @@ export default function Feed({ sort, subscribedOnly, specificUserOnly}) {
             
             setFeedId(r.feed_id)
             setPosts([])
-            setReachedEnd(false)
+            setHasMore(true)
         })
         .catch(() => {
             alert('Ошибка создания новостной ленты!')
@@ -62,13 +62,12 @@ export default function Feed({ sort, subscribedOnly, specificUserOnly}) {
     }, [sort, subscribedOnly, specificUserOnly])
 
     return (
-        <div className="w-full pb-5">
+        <>
             <InfiniteScroll
                 threshold={100}
-                pageStart={0}
                 loadMore={() => loadPosts(FEED_LOAD_BATCH)}
-                hasMore={!reachedEnd}
-                loader={<div className="loader" key={0}>Loading ...</div>}
+                hasMore={hasMore}
+                loader={<div className="w-full text-center" key={0}>Loading ...</div>}
                 useWindow={false}
             >
                 {posts.map(post => (
@@ -79,9 +78,8 @@ export default function Feed({ sort, subscribedOnly, specificUserOnly}) {
             </InfiniteScroll>
 
             {endMessage && (
-                <span className="block text-center w-full">{endMessage}</span>
+                <span className="block text-center w-full mb-5">{endMessage}</span>
             )}
-        </div>
-
+        </>
     )
 }

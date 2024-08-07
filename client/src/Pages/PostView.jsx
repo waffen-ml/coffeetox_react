@@ -1,22 +1,22 @@
 import { useParams } from 'react-router-dom'
 import Post from '../Components/Post'
 import { useEffect, useState } from 'react'
-import { hostURL } from '../utils'
+import { hostURL, quickFetch } from '../utils'
 
 export default function PostView() {
     const { id } = useParams()
     const [postData, setPostData] = useState(null)
 
     useEffect(() => {
-        fetch(hostURL(`/post/json/${id}`), {credentials:'include'})
-        .then(r => r.json())
-        .then(r => {
-            setPostData(r)
-        })
+        quickFetch('/post/json/' + id)
+        .then(r => setPostData(r))
+        .catch(() => setPostData({error: true}))
     }, [])
 
     if(!postData)
-        return <>Loading...</>
+        return <>Загрузка...</>
+    else if(postData.error)
+        return <>Не удалось загрузить пост</>
 
     return <Post data={postData} />
 }

@@ -16,6 +16,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FormattedText from './FormattedText.jsx';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import {PSWP_obj} from "./Pswp.jsx"
+import Poll from './Poll.jsx';
 
 import PhotoSwipeVideoPlugin from '../photoswipe-video-plugin.esm.js';
 import PhotoSwipeLightbox from 'photoswipe/lightbox';
@@ -838,10 +839,14 @@ export default function Post({ data, isCompact}) {
     return (
         <postContext.Provider value={{postId: data.id}}>
             <div className="bg-gray-200 shadow-md rounded-lg p-3 w-full flex flex-col gap-2">
+
+                {Date.now() < new Date(data.created_at) && (
+                    <span className="text-lg text-green-700">Отложен</span>
+                )}
+
                 <div className="w-full flex justify-between items-start">
                     <AvatarNameDescriptionWidget user={data.author} description={getPostDatetimeLabel(new Date(data.created_at))}/>
                     {!isCompact && <IconButton onClick={e => setActionMenuAnchor(e.currentTarget)}><MoreHorizIcon/></IconButton>}
-
                 </div>
                 <FormattedText text={data.text} title={data.title} renderAttachments={true}/>
                 <PostVisualFiles files={data.files} isCompact={isCompact}/>
@@ -851,6 +856,8 @@ export default function Post({ data, isCompact}) {
                 {data.fwd_post && (
                     <Post data={data.fwd_post} isCompact={true}/>
                 )}
+
+                {data.poll && <Poll data={data.poll}/> }
 
                 { !isCompact && (
                     <>
@@ -878,6 +885,22 @@ export default function Post({ data, isCompact}) {
                 open={Boolean(actionMenuAnchor)}
                 onClose={() => setActionMenuAnchor(null)}
             >
+                <MenuItem 
+                    onClick={() => {
+                        showReactions()
+                        setActionMenuAnchor(null)
+                    }}
+                >
+                    Реакции
+                </MenuItem>
+                <MenuItem 
+                    onClick={() => {
+                        navigator.clipboard.writeText(hostURL('/post/' + data.id))
+                        setActionMenuAnchor(null)
+                    }}
+                >
+                    Копировать ссылку
+                </MenuItem>
                 {currentUser && currentUser.id == data.author.id && (
                     <MenuItem 
                         onClick={() => {
@@ -887,14 +910,6 @@ export default function Post({ data, isCompact}) {
                             Удалить
                         </MenuItem>
                 )}
-                <MenuItem 
-                    onClick={() => {
-                        showReactions()
-                        setActionMenuAnchor(null)
-                    }}
-                >
-                    Реакции
-                </MenuItem>
             </Menu>
 
             <Dialog

@@ -3,26 +3,8 @@ import { findInputError, isFormInvalid } from "../utils"
 import { useState, useRef, useEffect } from 'react'
 import {Link, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Checkbox, FormControlLabel} from '@mui/material'
 import FormattedText from "./FormattedText"
+import { trimMultilineText } from "../utils"
 
-export const SimpleInput = ({label, type, name, placeholder, validation}) => {
-    const { control } = useFormContext()
-    const {field} = useController({
-        name, control,
-        rules: validation,
-        defaultValue: ''
-    })
-
-    return (
-        <InputWrapper label={label} name={name}>
-            <input
-                className="w-full p-5 font-medium border rounded-md border-slate-300 placeholder:opacity-60" 
-                type={type}
-                placeholder={placeholder}
-                {...field}
-            />
-        </InputWrapper>
-    )
-}
 
 export const CheckboxInput = ({name, label}) => {
     const { control } = useFormContext()
@@ -44,21 +26,47 @@ export const CheckboxInput = ({name, label}) => {
     )
 }
 
-export const TextAreaInput = ({label, name, placeholder, validation}) => {
-    const { control } = useFormContext()
-    const {field} = useController({
-        name, control,
-        rules: validation,
-        defaultValue: ''
-    })
+export const SimpleInput = ({label, type, name, placeholder, validation, valueTransform}) => {
+    const { register } = useFormContext()
+
+    if(valueTransform === undefined && type === 'text')
+        valueTransform = trimMultilineText
+
+    return (
+        <InputWrapper label={label} name={name}>
+            <input
+                className="w-full p-4 font-medium border rounded-md border-slate-300 placeholder:opacity-60" 
+                type={type}
+                placeholder={placeholder}
+                {...register(
+                    name, {
+                        ...validation,
+                        setValueAs: valueTransform
+                    }
+                )}
+            />
+        </InputWrapper>
+    )
+}
+
+export const TextAreaInput = ({label, name, placeholder, validation, valueTransform}) => {
+    const { register } = useFormContext()
+
+    if(valueTransform === undefined)
+        valueTransform = trimMultilineText
 
     return (
         <InputWrapper label={label} name={name}>
             <textarea
-                className="w-full p-5 font-medium border rounded-md border-slate-300 placeholder:opacity-60" 
+                className="w-full p-4 font-medium border rounded-md border-slate-300 placeholder:opacity-60" 
                 name={name}
                 placeholder={placeholder}
-                {...field}
+                {...register(
+                    name, {
+                        ...validation,
+                        setValueAs: valueTransform
+                    }
+                )}
             >
             </textarea>
         </InputWrapper>
@@ -72,7 +80,7 @@ export function FormattedTextInput({label, name, placeholder, renderAttachments,
     return (
         <>
             <div className="flex flex-col gap-1 items-start w-full">
-                <TextAreaInput name={name} label={label} placeholder={placeholder} validation={validation}/>
+                <TextAreaInput name={name} label={label} placeholder={placeholder} validation={validation} valueTransform={trimMultilineText}/>
                 <Link component="button" onClick={() => togglePreview(true)} underline="hover">Предпросмотр</Link>
             </div>
 

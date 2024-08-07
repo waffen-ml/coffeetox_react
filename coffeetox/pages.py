@@ -7,7 +7,7 @@ from coffeetox.fs import send_react_app
 @app.route('/login', methods=['GET'])
 @app.route('/confirm_email/<string:key>', methods=['GET'])
 @app.route('/new_post', methods=['GET'])
-@app.route('/post/<string:id>')
+@app.route('/post/<int:id>')
 @app.route('/ua')
 @app.route('/capytaire')
 @app.route('/set_avatar', methods=['GET'])

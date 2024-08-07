@@ -57,7 +57,7 @@ export function AvatarNameDescriptionWidget({user, description}) {
 export function UserListWithActions({users, actions, emptyMessage}) {
 
     return (
-        <ul className="flex flex-col w-full gap-0 [&>*:nth-child(even)]:bg-gray-300">
+        <ul className="flex flex-col w-full gap-2">
             {users.map((u, i) => (
                 <div key={i} className="flex gap-5 items-center w-full rounded-lg justify-between">
                     <AvatarTagWidget user={u}/>

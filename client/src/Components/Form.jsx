@@ -1,7 +1,7 @@
 import '../index.css'
 import { useForm, FormProvider } from 'react-hook-form'
 import {useState} from 'react'
-import { Link } from '@mui/material'
+import { Link, Button } from '@mui/material'
 
 export default function Form({onSubmit, children, submitButtonLabel, hints, methodsRef, defaultValues, values, className}) {
     const methods = useForm({
@@ -31,7 +31,7 @@ export default function Form({onSubmit, children, submitButtonLabel, hints, meth
             noValidate
             className={className}
           >
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 items-start">
                 {children}
             </div>
 
@@ -48,9 +48,8 @@ export default function Form({onSubmit, children, submitButtonLabel, hints, meth
               </ul>
             )}
 
-            <div className="mt-5">
-              <button onClick={handledSubmit} className="flex items-center gap-1 p-5 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-800">{submitButtonLabel ?? 'Submit'}</button>
-            </div>
+            <Button onClick={handledSubmit} sx={{marginTop: 3}} variant="contained">{submitButtonLabel ?? 'Submit'}</Button>
+
           </form>
         </FormProvider>
     

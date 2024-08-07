@@ -1,4 +1,4 @@
-import { cfxContext, hostURL} from '../utils'
+import { cfxContext, hostURL, trimMultilineText} from '../utils'
 import {usernameValidation, tagValidation, emailValidation, passwordValidation, passwordRepValidation} from '../utils'
 import {Link } from "@mui/material"
 import { FormattedTextInput, SimpleInput, CheckboxInput } from '../Components/Input'

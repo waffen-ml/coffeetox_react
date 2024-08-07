@@ -3,23 +3,29 @@ from flask import request, abort, session
 from uuid import uuid4
 from coffeetox.fs import save_file
 from coffeetox.auth import User, subscription
+from coffeetox.polls import Poll
 from flask_login import login_required, current_user
 import datetime
+import json
+
 
 user_comment_like = db.Table('user_comment_like',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('comment_id', db.Integer, db.ForeignKey('post_comment.id'))
 )
 
+
 user_post_like = db.Table('user_post_like',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('post_id', db.Integer, db.ForeignKey('post.id'))
 )
 
+
 user_post_dislike = db.Table('user_post_dislike',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('post_id', db.Integer, db.ForeignKey('post.id'))
 )
+
 
 user_post_view = db.Table('user_post_view',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
@@ -35,6 +41,9 @@ class Post(db.Model):
                                 default=lambda: datetime.datetime.now(datetime.timezone.utc))
     is_deleted = db.Column(db.Boolean(), nullable=False, default=False)
     author_id = db.Column(db.Integer(), db.ForeignKey('user.id'), nullable=False)
+    poll_id = db.Column(db.Integer(), db.ForeignKey('poll.id'))
+
+    poll = db.relationship('Poll', backref='post', cascade='all,delete', lazy=True, uselist=False)
 
     files = db.relationship('File', backref='origin_post', lazy=True)
     comments = db.relationship('PostComment', backref='post', lazy=True)
@@ -96,7 +105,8 @@ class Post(db.Model):
             'dislikes': len(self.dislikes),
             'my_reaction': 0 if me is None else self.get_reaction(me),
             'comments': [c.to_dict(me=me) for c in self.comments],
-            'is_deleted': self.is_deleted
+            'is_deleted': self.is_deleted,
+            'poll': None if self.poll is None else self.poll.to_dict(me=me)
         }
 
 
@@ -142,6 +152,7 @@ class PostComment(db.Model):
 def get_my_id():
     return None if not current_user.is_authenticated else current_user.id
 
+
 @app.route('/post/json/<string:post_id>')
 def get_post_json(post_id):
     post = Post.query.get(post_id)
@@ -154,25 +165,42 @@ def get_post_json(post_id):
 
 @app.route('/new_post', methods=['POST'])
 @login_required
-def new_post():
+def route_new_post():
     title = request.form.get('title', '')[:150]
     body = request.form.get('body', '')[:2000]
     fwd_post_id = request.form.get('fwd_post_id', None)
     files = request.files.getlist('files')
-
+    plan_datetime = request.form.get('plan_datetime', None)
+    poll_json = request.form.get('poll_json', None)
+    
     post = Post(title=title, text=body, author_id=current_user.id)
 
-    db.session.add(post)
+    if plan_datetime is not None and plan_datetime != 'null':
+        plan_datetime = datetime.datetime.strptime(plan_datetime, '%Y-%m-%dT%H:%M:%S.%fZ')
+        post.created_at = plan_datetime
+
+    if poll_json is not None and poll_json != 'null':
+        poll_json = json.loads(poll_json)
+        poll = Poll(
+            is_anonymous=poll_json['is_anonymous'],
+            title=poll_json['title']
+        )
+        db.session.add(poll)
+        db.session.commit()
+        poll.add_options(poll_json['options'])
+        post.poll_id = poll.id
     
+    db.session.add(post)
+
     if fwd_post_id is not None:
         fwd_post = Post.query.get(int(fwd_post_id))
         if fwd_post is not None:
             fwd_post.post_fwds.append(post)
 
-    db.session.commit()
-
     for file in files:
         save_file(file, origin_post=post)
+
+    db.session.commit()
 
     return {'success': 1}
 
@@ -335,10 +363,10 @@ def generate_feed():
         'feed_id': feed_id
     }
 
+
 @app.route('/feed_batch/<string:feed_id>')
 def feed_batch(feed_id):
     amount = int(request.args.get('amount', 10))
-
 
     if 'feed' not in session or feed_id not in session['feed']:
         return {
@@ -354,7 +382,7 @@ def feed_batch(feed_id):
             'error': 'CURRENT_USER_WAS_CHANGED'
         }
     
-    order = Post.id.asc() if feed['sort'] == 'TIME_ASC' else Post.id.desc()
+    order = Post.created_at.asc() if feed['sort'] == 'TIME_ASC' else Post.created_at.desc()
     query = None
 
     if feed['specific_user_only_id'] is not None:
@@ -371,10 +399,14 @@ def feed_batch(feed_id):
             .join(my_subs, my_subs.c.target_id == Post.author_id, isouter=True)\
             .filter((my_subs.c.subscriber_id == current_user.id) | (User.is_private == False) | (User.id == current_user.id))
     
-    posts = query.filter(Post.is_deleted == False).order_by(order).limit(amount).offset(feed['current']).all()
+    now = datetime.datetime.now(datetime.timezone.utc)
+
+    posts = query.filter(Post.is_deleted == False)\
+            .filter((Post.created_at <= now) | (Post.author_id == current_user.id))\
+            .order_by(order).limit(amount).offset(feed['current']).all()
     
     feed['current'] += amount
-    feed['updated_at'] = datetime.datetime.now(datetime.timezone.utc)
+    feed['updated_at'] = now
 
     session.modified = True
 

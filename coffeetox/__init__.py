@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
+from flask_migrate import Migrate
 
 class CFXConfig(dict):
     def __init__(self, path):
@@ -32,11 +33,13 @@ if cfx_config.vite_dev:
 cors = CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 db = SQLAlchemy(app)
+mirgate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
 from coffeetox import auth
 from coffeetox import fs
+from coffeetox import polls
 from coffeetox import posts
 from coffeetox import pages
 from coffeetox import email
