@@ -21,6 +21,8 @@ export default function Poll({data}) {
     const [optionOpen, setOptionOpen] = useState(null)
     const {currentUser} = useContext(cfxContext)
 
+    console.log(data)
+
     const vote = (optionId, retract) => {
         if(!currentUser)
             return
