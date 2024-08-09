@@ -151,7 +151,7 @@ function PostVisualFiles({files, isCompact}) {
         return <></>
     else if(w.nVisual == 1) {
         return (
-            <div id={galleryId} className={"w-full bg-gray-100 rounded-lg overflow-hidden"}>
+            <div id={galleryId} className={"w-full bg-cfx-box rounded-lg overflow-hidden"}>
                 {w.nImages == 1 && (
                     <PSWP_obj 
                         src={fileURL(w.images[0].id)}
@@ -197,7 +197,7 @@ function PostVisualFiles({files, isCompact}) {
                         isCropped={true}
                         innersx={{
                             objectFit: 'cover',
-                            background: 'grey'
+                            background: 'rgb(var(--cfx-box))'
                         }}
                         outersx={{
                             maxHeight: isCompact? '150px' : '225px',
@@ -215,7 +215,7 @@ function PostVisualFiles({files, isCompact}) {
                         isCropped={true}
                         innersx={{
                             objectFit: 'cover',
-                            background: 'grey'
+                            background: 'rgb(var(--cfx-box))'
                         }}
                         outersx={{
                             maxHeight: isCompact? '150px' : '225px',
