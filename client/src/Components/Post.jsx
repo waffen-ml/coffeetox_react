@@ -251,9 +251,9 @@ function PostAudioFiles({files}) {
         return <></>
     
     return (
-        <div className="flex flex-column gap-1">
+        <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 400px))'}}>
             {audio.map((f) => (
-                <div className="bg-gray-300 p-2 rounded-lg flex flex-col gap-1 overflow-hidden w-[400px] max-w-full" key={f.id}>
+                <div className="bg-gray-300 p-2 rounded-lg flex flex-col gap-1 overflow-hidden w-full" key={f.id}>
                     <span>{f.filename}</span>
                     <audio className="w-full" controls><source src={fileURL(f.id)} type={f.content_type}/></audio>
                 </div>

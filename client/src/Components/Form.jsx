@@ -48,7 +48,9 @@ export default function Form({onSubmit, children, submitButtonLabel, hints, meth
               </ul>
             )}
 
-            <Button onClick={handledSubmit} sx={{marginTop: 3}} variant="contained">{submitButtonLabel ?? 'Submit'}</Button>
+            <div className="mt-3 mb-6">
+              <Button onClick={handledSubmit} variant="contained">{submitButtonLabel ?? 'Submit'}</Button>
+            </div>
 
           </form>
         </FormProvider>
