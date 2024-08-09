@@ -215,7 +215,7 @@ function YoutubeGrid({videos}) {
 
     return (
         <div
-            className="rounded-lg gap-2 bg-gray-200 grid justify-center max-w-full mt-1"
+            className="rounded-lg gap-2 bg-cfx-box grid justify-center max-w-full mt-1"
             style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))'}}
         >
             {shorts.map((v, i) => (
