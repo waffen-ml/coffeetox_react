@@ -9,7 +9,7 @@ export default function SiteSettings() {
 
     const handleSubmit = (data) => {
         alert('Пока что не работает!')       
-        return
+        return;
         localStorage.setItem('theme', data.theme)
         
         updateTheme()
