@@ -5,7 +5,7 @@ import { quickFetch } from '../utils'
 import DoneIcon from '@mui/icons-material/Done';
 import CloseIcon from '@mui/icons-material/Close';
 import {UserListWithActions} from "../Components/UserWidgets.jsx"
-
+import Page from '../Components/Page.jsx';
 
 
 export default function SubscriptionRequests() {
@@ -75,9 +75,8 @@ export default function SubscriptionRequests() {
     }
 
     return (
+        <Page title="Подписки">
         <div className="flex flex-col gap-3">
-            <h1 className="text-3xl">Подписки</h1>
-            
             <Tabs value={tab} onChange={(_, t) => setTab(t)} sx={{'.MuiTabs-scrollButtons.Mui-disabled': {opacity:0.3}}} allowScrollButtonsMobile={true} variant="scrollable" scrollButtons="auto">
                 <Tab label={`Мои подписчики (${mySubscribers.length})`}/>
                 <Tab label={`Мои подписки (${mySubscriptions.length})`}/>
@@ -143,6 +142,8 @@ export default function SubscriptionRequests() {
             )}
 
         </div>
+        </Page>
+
     )
 
 }

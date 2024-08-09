@@ -3,6 +3,7 @@ import Form from '../Components/Form'
 import {SimpleInput} from '../Components/Input'
 import { useState } from 'react'
 import { hostURL } from '../utils'
+import Page from '../Components/Page'
 
 const codeValidation = {
     validate: {
@@ -42,11 +43,13 @@ export default function ConfirmEmail() {
             setError('Не удалось подтвердить адрес')
         })
     }
-
+    
     return (
-        <Form errorMessage={error} onSubmit={onSubmit} submitButtonLabel="Подтвердить">
-            <SimpleInput label="Код подтверждения" name="confCode" validation={codeValidation} type="text" placeholder="000000"/>
-        </Form>
+        <Page title="Подтвердить почту">
+            <Form errorMessage={error} onSubmit={onSubmit} submitButtonLabel="Подтвердить">
+                <SimpleInput label="Код подтверждения" name="confCode" validation={codeValidation} type="text" placeholder="000000"/>
+            </Form>
+        </Page>
     )
 
 }

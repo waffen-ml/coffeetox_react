@@ -13,6 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DialogImageEditor from "./DialogImageEditor.jsx";
 import { useFormContext } from "react-hook-form"
 import {InputWrapper} from "./Input.jsx"
+import {CfxBox} from './CfxBaseComponents.jsx'
 
 
 function getPrimitiveType(file) {
@@ -287,8 +288,8 @@ export default function MyFileUploader({maxFiles, maxSizeBytes, onChange, width,
 
     return (
         <InputWrapper label={label} name={name}>
-        <div
-            className="flex flex-col relative gap-2 items-start w-full min-w-[250px] max-w-full h-full min-h-[100px] rounded-lg p-2 bg-gray-200 overflow-y-auto"
+        <CfxBox
+            className="flex flex-col relative gap-2 items-start w-full min-w-[250px] max-w-full h-full min-h-[100px] overflow-y-auto"
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
             onDrop={onDrop}
@@ -321,7 +322,7 @@ export default function MyFileUploader({maxFiles, maxSizeBytes, onChange, width,
             )}
 
             {files.length > 0 && (
-                <ul id="uploader_gallery" className="flex flex-col gap-0 w-full [&>*:nth-child(odd)]:bg-gray-300">
+                <ul id="uploader_gallery" className="flex flex-col gap-0 w-full [&>*:nth-child(odd)]:bg-white/30">
                     
                     {files.length > 0 && files.map((f, i) => (
                         <FileBar
@@ -365,7 +366,7 @@ export default function MyFileUploader({maxFiles, maxSizeBytes, onChange, width,
                 minWidth={50}
                 minHeight={50}
             />
-        </div>  
+        </CfxBox>  
         </InputWrapper>
     )
 

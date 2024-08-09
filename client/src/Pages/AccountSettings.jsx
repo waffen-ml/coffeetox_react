@@ -4,6 +4,7 @@ import {Link } from "@mui/material"
 import { FormattedTextInput, SimpleInput, CheckboxInput } from '../Components/Input'
 import Form from '../Components/Form'
 import {useEffect, useState, useContext} from 'react'
+import Page from '../Components/Page'
 
 export default function AccountSettings() {
     const [currentValues, setCurrentValues] = useState(null)
@@ -48,9 +49,7 @@ export default function AccountSettings() {
     }
 
     return (
-        <>
-            <h1 className="text-3xl">Настройки аккаунта</h1>
-
+        <Page title="Настройки аккаунта">
             <ul className="mt-3">
                 <li><Link href="/set_avatar">Сменить аватар</Link></li>
                 <li><Link href="/change_password">Сменить пароль</Link></li>
@@ -67,7 +66,8 @@ export default function AccountSettings() {
                 <SimpleInput validation={emailValidation} type="text" label="Email" name="email" />
                 <CheckboxInput name="is_private" label="Приватный аккаунт"/>
             </Form>
-        </>
+
+        </Page>
     )
 
 }

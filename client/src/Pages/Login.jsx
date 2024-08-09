@@ -2,6 +2,7 @@ import {SimpleInput} from '../Components/Input'
 import Form from '../Components/Form'
 import { hostURL } from '../utils'
 import { useRef } from 'react'
+import Page from '../Components/Page'
 
 export default function Login() {
     const onSubmit = (data) => {
@@ -41,15 +42,18 @@ export default function Login() {
     ]
 
     return (
-        <Form
-            submitButtonLabel="Войти"
-            onSubmit={onSubmit}
-            hints={hints}
-            methodsRef={methodsRef}
-        >
-            <SimpleInput validation={{required:true}} label="Имя аккаунта" name="tag" type="text" placeholder="ilya_capybara"/>
-            <SimpleInput validation={{required:true}} label="Пароль" name="password" type="password" />
-        </Form>
+        <Page title="Вход">
+            <Form
+                submitButtonLabel="Войти"
+                onSubmit={onSubmit}
+                hints={hints}
+                methodsRef={methodsRef}
+            >
+                <SimpleInput validation={{required:true}} label="Имя аккаунта" name="tag" type="text" placeholder="ilya_capybara"/>
+                <SimpleInput validation={{required:true}} label="Пароль" name="password" type="password" />
+            </Form>
+        </Page>
+
     )
 
 }

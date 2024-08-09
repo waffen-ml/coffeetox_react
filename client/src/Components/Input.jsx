@@ -1,7 +1,7 @@
 import { useFormContext, Controller, useController } from "react-hook-form"
 import { findInputError, isFormInvalid } from "../utils"
 import { useState, useRef, useEffect } from 'react'
-import {Link, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Checkbox, FormControlLabel} from '@mui/material'
+import {Link, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Checkbox, Radio, FormControlLabel, RadioGroup} from '@mui/material'
 import FormattedText from "./FormattedText"
 import { trimMultilineText } from "../utils"
 
@@ -23,6 +23,26 @@ export const CheckboxInput = ({name, label}) => {
             }
             label={label}
         />
+    )
+}
+
+export const RadioGroupInput = ({name, label, options}) => {
+    const { control } = useFormContext()
+    const {field} = useController({
+        name, control
+    })
+
+    return (
+        <InputWrapper name={name} label={label}>
+            <RadioGroup
+                {...field}
+            >
+                {options.map((op, i) => (
+                    <FormControlLabel key={i} value={op.value} control={<Radio />} label={op.label} />
+                ))}
+            </RadioGroup>    
+        </InputWrapper>
+
     )
 }
 

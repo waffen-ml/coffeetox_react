@@ -4,7 +4,7 @@ import Cropper from 'react-easy-crop'
 import Button from '@mui/material/Button'
 import { Avatar } from "@mui/material"
 import { blobToBase64, cropImageSrc, hostURL, dataURLtoFile, cfxContext } from "../utils"
-
+import Page from "../Components/Page"
 
 export default function SetAvatar() {
     const [imageSrc, setImageSrc] = useState(null)
@@ -67,8 +67,7 @@ export default function SetAvatar() {
     }
 
     return (
-        <>
-            <h1 className="mb-3 text-2xl">Обрежьте аватар</h1>
+        <Page title="Обрежьте аватар" documentTitle="Новый аватар">
             <div className="relative w-full h-[400px]">
                 <Cropper
                     image={imageSrc}
@@ -92,7 +91,7 @@ export default function SetAvatar() {
                 </Button>
             </div>
             {status && <span className="block mt-2">{status}</span>}
-        </>
+        </Page>
     )
 
 

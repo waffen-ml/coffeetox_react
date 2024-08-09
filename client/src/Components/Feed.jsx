@@ -51,6 +51,7 @@ export default function Feed({ sort, subscribedOnly, specificUserOnly}) {
             console.log('A NEW FEED HAS BEEN CREATED')
             console.log(r)
             
+            setEndMessage(null)
             setFeedId(r.feed_id)
             setPosts([])
             setHasMore(true)

@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom'
 import Post from '../Components/Post'
 import { useEffect, useState } from 'react'
 import { hostURL, quickFetch } from '../utils'
+import Page from '../Components/Page'
 
 export default function PostView() {
     const { id } = useParams()
@@ -18,5 +19,10 @@ export default function PostView() {
     else if(postData.error)
         return <>Не удалось загрузить пост</>
 
-    return <Post data={postData} />
+    return (
+        <Page documentTitle={`Пост @${postData.author.tag}`}>
+            <Post data={postData} />
+        </Page>
+    )
+        
 }

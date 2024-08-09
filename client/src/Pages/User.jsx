@@ -4,6 +4,7 @@ import { hostURL, loadUserData, quickFetch, getLastSeenLabel, fileURL, cfxContex
 import {Avatar, Button, Link, Select, MenuItem, List, ListItem} from "@mui/material"
 import FormattedText from '../Components/FormattedText'
 import Feed from '../Components/Feed'
+import Page from '../Components/Page'
 
 export default function User({}) {
     const { tag } = useParams()
@@ -70,7 +71,7 @@ export default function User({}) {
         return <>Загрузка...</>
 
     return (
-        <>
+        <Page documentTitle={`@${userData.tag}`}>
             <div className="w-full grid gap-x-4 gap-y-0 grid-cols-[auto_1fr] sm:grid-cols-[auto_1fr_auto]">
                 <div className="row-span-5 w-[100px] h-[100px]">
                     <Avatar
@@ -108,7 +109,7 @@ export default function User({}) {
                     
                     {currentUser && currentUser.id === userData.id && (
                         <>
-                            <Button href="/account_settings">Настройки</Button>
+                            <Button href="/account_settings">Изменить</Button>
                             <Button href="/subscriptions">Подписки</Button>
                         </>
                     )}
@@ -127,7 +128,7 @@ export default function User({}) {
                 <>
                     <Select
                         size="small"
-                        className="mt-2"
+                        className="mt-2 mb-2"
                         value={feedSort}
                         onChange={e => setFeedSort(e.target.value)}
                     >
@@ -135,14 +136,12 @@ export default function User({}) {
                         <MenuItem value='TIME_ASC'>Сначала старые</MenuItem>
                     </Select>
 
-                    <div className="mt-3">
-                        <Feed sort={feedSort} specificUserOnly={userData.id}/>
-                    </div>
+                    <Feed sort={feedSort} specificUserOnly={userData.id}/>
                 </>
             )}
 
 
-        </>
+        </Page>
     )
 
 

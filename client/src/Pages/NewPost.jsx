@@ -10,6 +10,8 @@ import FormattedText from '../Components/FormattedText'
 import MyFileUploader from '../Components/MyFileUploader'
 import { useFormContext, Controller, useController } from "react-hook-form"
 import ClearIcon from '@mui/icons-material/Clear';
+import Page from '../Components/Page'
+import {CfxBox} from '../Components/CfxBaseComponents.jsx'
 
 const titleValidation = {
     maxLength: {
@@ -60,7 +62,7 @@ function PollConstructor() {
         return <Link component="button" onClick={() => togglePoll(true)}>Прикрепить опрос</Link>
 
     return (
-        <div className="flex flex-col gap-1 p-2 rounded-lg bg-gray-100 items-start max-w-full w-[400px]">
+        <CfxBox className="flex flex-col gap-1 items-start max-w-full w-[400px]">
             <SimpleInput
                 name="poll_title"
                 label="Заголовок опроса"
@@ -107,7 +109,7 @@ function PollConstructor() {
 
             <CheckboxInput name="poll_is_anonymous" label="Анонимный опрос"/>
             <Link component="button" onClick={() => togglePoll(false)}>Удалить опрос</Link>
-        </div>
+        </CfxBox>
     )
 
 }
@@ -136,7 +138,7 @@ function PlanningManager() {
         )
 
     return (
-        <div className="flex flex-col gap-1 p-2 rounded-lg bg-gray-100 items-start">
+        <CfxBox className="flex flex-col gap-1 items-start">
             
             <InputWrapper name="plan_datetime" label="Запланировать публикацию">
                 <input
@@ -167,7 +169,7 @@ function PlanningManager() {
             >
                 Отмена
             </Link>
-        </div>
+        </CfxBox>
     )
 
 
@@ -242,29 +244,32 @@ export default function NewPost() {
     }
 
     return (
-        <Form
-            onSubmit={onSubmit}
-            submitButtonLabel="Публиковать"
-            defaultValues={{
-                title: '', body: '', files: []
-            }}
-        >
-            <SimpleInput type="text" name="title" label="Заголовок" validation={titleValidation}/>
-            <FormattedTextInput name="body" label="Основной текст" validation={bodyValidation}/>
-            <MyFileUploader name="files" label="Прикрепить файлы" maxFiles={10} maxSizeMB={25 * 1024 * 1024} width={400} />
-            {fwdPost && (
-                <div className="flex flex-col gap-2 items-start">
-                    <span>Вы хотите поделиться постом</span>
-                    {fwdPost.loading && <span>Пост загружается...</span>}
-                    {fwdPost.error && <span>Произошла ошибка.</span>}
-                    {fwdPost.success && (
-                        <Post isCompact={true} data={fwdPost}/>
-                    )}
-                    <Link component="button" onClick={() => setFwdPost(null)} underline="hover">Удалить</Link>
-                </div>
-            )}
-            <PollConstructor/>
-            <PlanningManager/>
-        </Form>
+        <Page title="Новый пост">
+            <Form
+                onSubmit={onSubmit}
+                submitButtonLabel="Публиковать"
+                defaultValues={{
+                    title: '', body: '', files: []
+                }}
+            >
+                <SimpleInput type="text" name="title" label="Заголовок" validation={titleValidation}/>
+                <FormattedTextInput name="body" label="Основной текст" validation={bodyValidation}/>
+                <MyFileUploader name="files" label="Прикрепить файлы" maxFiles={10} maxSizeMB={25 * 1024 * 1024} width={400} />
+                {fwdPost && (
+                    <div className="flex flex-col gap-2 items-start">
+                        <span>Вы хотите поделиться постом</span>
+                        {fwdPost.loading && <span>Пост загружается...</span>}
+                        {fwdPost.error && <span>Произошла ошибка.</span>}
+                        {fwdPost.success && (
+                            <Post isCompact={true} data={fwdPost}/>
+                        )}
+                        <Link component="button" onClick={() => setFwdPost(null)} underline="hover">Удалить</Link>
+                    </div>
+                )}
+                <PollConstructor/>
+                <PlanningManager/>
+            </Form>
+        </Page>
+
     )
 }

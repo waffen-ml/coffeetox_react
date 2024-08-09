@@ -35,21 +35,25 @@ export default function Form({onSubmit, children, submitButtonLabel, hints, meth
                 {children}
             </div>
 
-            {message && <span>{message}</span>}
+            {message && <span className="block mt-2">{message}</span>}
 
             {hints && hints.length && (
-              <ul className="mt-5">
+              <ul className="mt-3">
                 {hints.map((h, i) => (
                   <li key={i}>
-                    {h.action && <Link component="button" onClick={h.action}>{h.label}</Link>}
-                    {!h.action && <Link href={h.url}>{h.label}</Link>}
+                    <Link
+                      onClick={h.action}
+                      href={h.url}
+                    >
+                      {h.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
             )}
 
-            <div className="mt-3 mb-6">
-              <Button onClick={handledSubmit} variant="contained">{submitButtonLabel ?? 'Submit'}</Button>
+            <div className="mt-5 mb-6">
+              <Button type="submit" onClick={handledSubmit} variant="contained">{submitButtonLabel ?? 'Submit'}</Button>
             </div>
 
           </form>

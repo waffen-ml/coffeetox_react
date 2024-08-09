@@ -22,6 +22,8 @@ import PhotoSwipeVideoPlugin from '../photoswipe-video-plugin.esm.js';
 import PhotoSwipeLightbox from 'photoswipe/lightbox';
 import 'photoswipe/style.css';
 
+import { CfxBox } from './CfxBaseComponents.jsx';
+
 const postContext = createContext({})
 const DEFAULT_VISIBLE_THREADS = 5
 const SHOW_MORE_THREADS_STEP = 20
@@ -251,16 +253,17 @@ function PostAudioFiles({files}) {
         return <></>
     
     return (
-        <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 400px))'}}>
+        <div className="grid gap-x-1 gap-y-1" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))'}}>
             {audio.map((f) => (
-                <div className="bg-gray-300 p-2 rounded-lg flex flex-col gap-1 overflow-hidden w-full" key={f.id}>
+                <CfxBox className="flex flex-col gap-1 w-full max-w-[400px] justify-between" key={f.id}>
                     <span>{f.filename}</span>
                     <audio className="w-full" controls><source src={fileURL(f.id)} type={f.content_type}/></audio>
-                </div>
+                </CfxBox>
             ))}
         </div>
     )
 }
+
 
 function PostStatsBar({nLikes, nDislikes, nViews, nReposts, nComments, myInitialReaction, onComment}) {
     const { currentUser } = useContext(cfxContext)
@@ -838,7 +841,7 @@ export default function Post({ data, isCompact}) {
 
     return (
         <postContext.Provider value={{postId: data.id}}>
-            <div className="bg-gray-200 shadow-md rounded-lg p-3 w-full flex flex-col gap-2">
+            <CfxBox className="shadow-md w-full p-3 flex flex-col gap-2">
 
                 {Date.now() < new Date(data.created_at) && (
                     <span className="text-lg text-green-700">Отложен</span>
@@ -877,7 +880,7 @@ export default function Post({ data, isCompact}) {
                         />
                     </>
                 )}
-            </div>
+            </CfxBox>
 
             <Menu
                 id="action-menu"

@@ -3,6 +3,7 @@ import { useState, useContext } from "react";
 import { Button, Link, Dialog, DialogActions, DialogContent, DialogTitle} from "@mui/material";
 import { UserListWithActions } from "./UserWidgets";
 import DoneIcon from '@mui/icons-material/Done';
+import { CfxBox } from "./CfxBaseComponents";
 
 function numVotersLabel(numVoters) {
     if (numVoters == 0)
@@ -75,7 +76,7 @@ export default function Poll({data}) {
     }
     
     return (
-        <div className="p-2 rounded-lg bg-gray-300 max-w-full flex flex-col gap-1 w-[300px] items-start">
+        <CfxBox className="max-w-full flex flex-col gap-1 w-[300px] items-start">
             {data.title  && <span className="text-lg font-bold">{data.title}</span>}
             {data.is_anonymous && <span className="text-md text-gray-800">Анонимный опрос</span>}
 
@@ -158,7 +159,7 @@ export default function Poll({data}) {
                     </>
                 )}
             </Dialog>
-        </div>
+        </CfxBox>
     )
 
 }

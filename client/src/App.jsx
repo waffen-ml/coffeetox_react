@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import NewPost from './Pages/NewPost'
 import PostView from './Pages/PostView'
+import SiteSettings from './Pages/SiteSettings'
 import Home from './Pages/Home'
 import CFXStandsWithUA from './Pages/CFXStandsWithUA'
 import Register from './Pages/Register'
@@ -22,9 +23,31 @@ import { AvatarTagWidget } from './Components/UserWidgets'
 import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Avatar, Link, Button, IconButton, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box} from '@mui/material'
+import {ThemeProvider, createTheme} from '@mui/material/styles'
 
+const DARK_THEME = createTheme({
+    palette: {
+        mode: 'dark'
+    }
+})
+
+const LIGHT_THEME = createTheme({
+    palette: {
+        mode: 'light'
+    }
+})
+
+function getCurrentTheme() {
+    let theme = localStorage.getItem('theme') ?? 'LIGHT'
+        
+    if (theme == 'DEVICE')
+        theme = window.matchMedia('(prefers-color-scheme: dark)').matches? 'DARK' : 'LIGHT'
+
+    return theme
+}
 
 export default function App() {
+    const [appTheme, setAppTheme] = useState(getCurrentTheme())
     const [currentUser, setCurrentUser] = useState(null)
     const [sideMenuOpen, toggleSideMenu] = useState(false)
     const mainContentRef = useRef(null)
@@ -38,6 +61,10 @@ export default function App() {
             setCurrentUser(r.you)
         })
         .catch(() => setCurrentUser({ id: -1 }))
+    }
+
+    const updateTheme = () => {
+        setAppTheme(getCurrentTheme())
     }
 
     const logout = () => {
@@ -58,10 +85,17 @@ export default function App() {
     }, [])
 
 
-    return (
-        <cfxContext.Provider value={{ currentUser, updateUserData, mainContentRef }}>
+    if(appTheme == 'DARK')
+        document.documentElement.classList.add('dark')
+    else
+        document.documentElement.classList.remove('dark')
 
-            <div className="absolute top-0 left-0 w-full h-[55px] shadow-sm bg-gray-200 z-[-1]"></div>
+    
+    return (
+        <ThemeProvider theme={appTheme == 'DARK'? DARK_THEME : LIGHT_THEME}>
+        <cfxContext.Provider value={{ currentUser, updateUserData, mainContentRef, updateTheme }}>
+
+            <div className="absolute top-0 left-0 w-full h-[55px] shadow-sm z-[-1] bg-cfx-box"></div>
 
             <div className="w-[768px] max-w-full box-border mx-auto grid grid-cols-[auto_1fr] grid-rows-[auto_1fr] gap-y-3 gap-x-8 h-dvh">
                 
@@ -97,17 +131,19 @@ export default function App() {
                         <li><Link href="/">Новости</Link></li>
                         <li><Link href="/?subscribed_only=1">Подписки</Link></li>
                         <li><Link href="/new_post">Создать пост</Link></li>
+                        <li><Link href="/settings">Настройки</Link></li>
                         <li><Link href="/capytaire">Каписьянс</Link></li>
                     </ul>
                 </div>
 
-                <div ref={mainContentRef} className="w-full h-full px-2 md:p0-0 md:pr-1 overflow-x-hidden overflow-y-auto col-span-2 md:col-span-1">
+                <div ref={mainContentRef} className="w-full h-full px-2 md:p-0 md:pr-1 overflow-y-auto overflow-x-hidden col-span-2 md:col-span-1">
                     <Router>
                         <Routes>
                             <Route path="/user/:tag" element={<User/>} />
                             <Route path="/register" element={<Register />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/confirm_email/:confKey" element={<ConfirmEmail />} />
+                            <Route path="/settings" element={<SiteSettings/>}/>
                             <Route exact path="/new_post" element={<NewPost />} />
                             <Route path="/post/:id" element={<PostView />} />
                             <Route exact path="/" element={<Home />} />
@@ -176,6 +212,14 @@ export default function App() {
                                 </ListItemText>
                             </ListItemButton>
                         </ListItem>
+                        
+                        <ListItem>
+                            <ListItemButton href="/settings">
+                                <ListItemText>
+                                    Настройки
+                                </ListItemText>
+                            </ListItemButton>
+                        </ListItem>
 
                         {currentUser && currentUser.id > 0 && (
                             <ListItem>
@@ -192,6 +236,7 @@ export default function App() {
             </Drawer>
 
         </cfxContext.Provider>
+        </ThemeProvider>
     )
 
 }
