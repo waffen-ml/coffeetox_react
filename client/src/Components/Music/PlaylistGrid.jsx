@@ -6,7 +6,7 @@ function PlaylistTile({playlist}) {
 
 
     return (
-        <a href={`/listen_pllt/` + playlist.id} className="rounded-lg overflow-hidden w-full relative text-black">
+        <a href={`/listen_pllt/` + playlist.id} className="rounded-lg overflow-hidden w-full max-w-[280px] relative text-black">
             
             <Cover isPlaylist={true} coverFile={playlist.cover_file}/>
 
@@ -30,9 +30,7 @@ export default function PlaylistGrid({playlists}) {
     return (
         <div className="grid gap-1" style={{gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))'}}>
             {playlists.map((pllt, i) => (
-                <div className="w-full max-w-[280px]">
-                    <PlaylistTile playlist={pllt} key={i}/>
-                </div>
+                <PlaylistTile playlist={pllt} key={i}/>
             ))}
         </div>
     )
