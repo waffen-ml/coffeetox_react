@@ -157,8 +157,11 @@ def route_create_soundtrack():
     cover_file = request.files.get('cover', None)
     add_to_playlists = request.form.getlist('add_to_playlists')
 
-    print(cover_file)
-    print(music_file)
+    if music_file is None:
+        return {
+            'success': 0,
+            'error': 'INVALID_INPUT'
+        }
 
     music_file_db = fs.save_file(music_file)
     cover_file_db = None if cover_file is None else fs.save_file(cover_file)
