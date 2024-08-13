@@ -174,7 +174,9 @@ def get_specifics(file_db):
 
 def save_file(file, **kwargs):
 
-    file_db = File(filename=file.filename,
+
+
+    file_db = File(filename=file.filename.encode(),
                 content_type=file.content_type,
                 content_length=file.content_length or get_file_content_length(file), **kwargs)
     
