@@ -42,6 +42,7 @@ class File(db.Model):
     
     def to_dict(self):
         print(self.specifics)
+        print(self.specifics is None)
         return {
             'id': self.id,
             'filename': self.filename,
