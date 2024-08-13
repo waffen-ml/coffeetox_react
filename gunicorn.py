@@ -6,3 +6,5 @@ workers = 6
 wsgi_app = 'coffeetox:app'
 keyfile = './coffeetox/ssl/privkey.pem'
 certfile = './coffeetox/ssl/fullchain.pem'
+preload = True
+
