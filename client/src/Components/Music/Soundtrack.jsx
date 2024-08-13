@@ -1,5 +1,5 @@
 import { QuickBreadcrumbsButton } from "../CfxBaseComponents"
-import { cfxContext, downloadFile, formatDuration} from "../../utils"
+import { cfxContext, copyText, downloadFile, formatDuration, hostURL} from "../../utils"
 import { useContext, useState } from "react"
 import PlaylistDependencyDialog from "./PlaylistDependencyDialog"
 import Cover from "./Cover"
@@ -18,6 +18,9 @@ export default function Soundtrack({soundtrack, onClick, actions, unavailableAct
     const [plltDepOpen, setPlltDepOpen] = useState(false)
 
     const defaultAvailableActions = [
+        {label: 'Скопировать ссылку', action: () => {
+            copyText(hostURL('/listen_st/' + soundtrack.id))
+        }},
         {label: 'Скачать', action: () => {
             downloadFile(soundtrack.music_file.id, soundtrack.name + '.mp3')
         }},

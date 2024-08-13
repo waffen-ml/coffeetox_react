@@ -81,25 +81,28 @@ export default function NewSoundtrack() {
 
     const handleSubmit = (data) => {
 
-        const add_to_playlists = []
-
+        const toSend = {
+            music: data.music,
+            name: data.name,
+            is_private: data.is_private,
+            author_name: data.author_name,
+            add_to_playlists: []
+        }
+        
         if (data.add_to_playlists) {
             data.add_to_playlists.forEach((s, i) => {
-                if (s) add_to_playlists.push(playlists[i].id)
+                if (s) 
+                    toSend.add_to_playlists.push(playlists[i].id)
             })
         }
+
+        if (data.cover)
+            toSend.cover = cover
 
         fetch(hostURL('create_soundtrack'), {
             method: 'POST',
             credentials: 'include',
-            body: jsonToFormData({
-                add_to_playlists,
-                cover: data.cover,
-                is_private: data.is_private,
-                music: data.music,
-                name: data.name,
-                author_name: data.author_name
-            })
+            body: jsonToFormData(toSend)
         })
         .then(r => r.json())
         .then(r => {

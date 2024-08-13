@@ -18,10 +18,18 @@ export default function NewPlaylist() {
     
     const handleSubmit = (data) => {
 
+        const toSend = {
+            name: data.name,
+            is_private: data.is_private
+        }
+
+        if (data.cover)
+            toSend.cover = data.cover
+
         fetch(hostURL('create_playlist'), {
             method: 'POST',
             credentials: 'include',
-            body: jsonToFormData(data)
+            body: jsonToFormData(toSend)
         })
         .then(r => r.json())
         .then(r => {
