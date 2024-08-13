@@ -8,8 +8,6 @@ export default function SiteSettings() {
     const {updateTheme} = useContext(cfxContext)
 
     const handleSubmit = (data) => {
-        alert('Пока что не работает!')       
-        return;
         localStorage.setItem('theme', data.theme)
         
         updateTheme()

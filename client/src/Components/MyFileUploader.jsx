@@ -143,7 +143,7 @@ function FileBar({ file, playAudio, deleteFile, editImage}) {
 }
 
 
-export default function MyFileUploader({maxFiles, maxSizeBytes, onChange, width, name, required, label}) {
+export default function MyFileUploader({maxFiles, maxSizeBytes, onChange, width, name, required, label, validation}) {
 
     const {register, setValue} = useFormContext()
 
@@ -156,7 +156,8 @@ export default function MyFileUploader({maxFiles, maxSizeBytes, onChange, width,
                     let s = 0
                     val.forEach(v => s += v.size)
                     return !maxSizeBytes || s <= maxSizeBytes || `Превышен лимит памяти`
-                }
+                },
+                ...validation
             }
         })
         setValue(name, [])

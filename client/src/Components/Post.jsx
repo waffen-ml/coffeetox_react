@@ -440,7 +440,7 @@ function PostCommentThread({main, comments, nShownComments, manager}) {
 
                 <div className="text-sm flex gap-2">
 
-                    <span className="text-gray-700">{getPostDatetimeLabel(main.created_at)}</span>
+                    <span className="opacity-70">{getPostDatetimeLabel(main.created_at)}</span>
 
                     {currentUser && currentUser.id > 0 && (
                         <Link 

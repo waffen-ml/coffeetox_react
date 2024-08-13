@@ -4,6 +4,13 @@ import datetime
 import mimetypes
 import os
 import re
+import json
+from PIL import Image
+import cv2
+from mutagen.wave import WAVE
+from mutagen.mp3 import MP3
+from mutagen.oggvorbis import OggVorbis
+
 
 class File(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -12,9 +19,10 @@ class File(db.Model):
                                 default=lambda: datetime.datetime.now(datetime.timezone.utc))
     content_length = db.Column(db.BigInteger(), nullable=False)
     content_type = db.Column(db.String(length=50), nullable=False)
-    
-    post_id = db.Column(db.Integer(), db.ForeignKey('post.id'))
-    
+    specifics = db.Column(db.String(200), nullable=True)
+
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+
     @property
     def primitive_type(self):
         pt = self.content_type
@@ -39,13 +47,12 @@ class File(db.Model):
             'upload_datetime': self.upload_datetime,
             'content_type': self.content_type,
             'primitive_type': self.primitive_type,
-            'content_length': self.content_length
+            'content_length': self.content_length,
+            'specifics': {} if self.specifics is None else json.loads(self.specifics)
         }
 
     def delete_content(self):
         os.remove(self.path)
-
-
 
 
 def send_react_app():
@@ -113,6 +120,58 @@ def get_file_content_length(file):
     file.stream.seek(0)
     return l
 
+def get_specifics(file_db):
+    try:
+
+        if file_db.primitive_type == 'image':
+            img = Image.open(file_db.path)
+            return {
+                'width': img.size[0],
+                'height': img.size[1]
+            }
+
+        elif file_db.primitive_type == 'video':
+            cap = cv2.VideoCapture(file_db.path)
+            success, frame = cap.read()
+
+            if not success:
+                raise Exception('Could not extract first frame')
+            
+            # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            img = Image.fromarray(frame)
+
+            fps = cap.get(cv2.CAP_PROP_FPS)
+            frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+            return {
+                'width': img.size[0],
+                'height': img.size[1],
+                'duration': int(frame_count / fps)
+            }
+        
+        elif file_db.primitive_type == 'audio':
+            audio = None
+
+            if file_db.extension.lower() == 'mp3':
+                audio = MP3(file_db.path)
+            elif file_db.extension.lower() == 'ogg':
+                audio = OggVorbis(file_db.path)
+            elif file_db.extension.lower() == 'wav':
+                audio = WAVE(file_db.path)
+
+            return {
+                'duration': 0 if audio is None else int(audio.info.length)
+            }
+
+
+    except Exception as ex:
+        print('Error while getting file specifics!')
+        print(ex)
+    
+    return None
+
+
+
 def save_file(file, **kwargs):
 
     file_db = File(filename=file.filename,
@@ -126,6 +185,18 @@ def save_file(file, **kwargs):
         os.mkdir(get_abspath(cfx_config.user_files_folder))
 
     file.save(file_db.path)
+
+    specifics = get_specifics(file_db)
+
+    print('-' * 10)
+    print(file.filename)
+    print(specifics)
+    print('-' * 10)
+
+    if specifics is not None:
+        file_db.specifics = json.dumps(specifics)
+
+    db.session.commit()
 
     return file_db
 

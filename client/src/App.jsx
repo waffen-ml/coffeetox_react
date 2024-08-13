@@ -9,6 +9,12 @@ import ConfirmEmail from './Pages/ConfirmEmail'
 import Capytaire from './Pages/Capytaire'
 import Login from './Pages/Login'
 import User from './Pages/User'
+import ListenST from './Pages/Music/ListenST'
+import NewSoundtrack from './Pages/Music/NewSoundtrack'
+import NewPlaylist from './Pages/Music/NewPlaylist'
+import ListenPlaylist from './Pages/Music/ListenPlaylist'
+import Music from './Pages/Music/Music'
+
 import Subscriptions from './Pages/Subscriptions'
 import ResetPassword from './Pages/ResetPassword'
 import ResetPasswordResult from './Pages/ResetPasswordResult'
@@ -24,6 +30,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Avatar, Link, Button, IconButton, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box} from '@mui/material'
 import {ThemeProvider, createTheme} from '@mui/material/styles'
+
 
 const DARK_THEME = createTheme({
     palette: {
@@ -90,7 +97,6 @@ export default function App() {
     else
         document.documentElement.classList.remove('dark')
 
-    
     return (
         <ThemeProvider theme={appTheme == 'DARK'? DARK_THEME : LIGHT_THEME}>
         <cfxContext.Provider value={{ currentUser, updateUserData, mainContentRef, updateTheme }}>
@@ -131,12 +137,14 @@ export default function App() {
                         <li><Link href="/">Новости</Link></li>
                         <li><Link href="/?subscribed_only=1">Подписки</Link></li>
                         <li><Link href="/new_post">Создать пост</Link></li>
+                        <li><Link href="/music">Музыка</Link></li>
                         <li><Link href="/settings">Настройки</Link></li>
                         <li><Link href="/capytaire">Каписьянс</Link></li>
                     </ul>
                 </div>
 
                 <div ref={mainContentRef} className="w-full h-full px-2 md:p-0 md:pr-1 overflow-y-auto overflow-x-hidden col-span-2 md:col-span-1">
+
                     <Router>
                         <Routes>
                             <Route path="/user/:tag" element={<User/>} />
@@ -157,6 +165,13 @@ export default function App() {
                             <Route path="/reset_password_start" element={<ResetPassword/>}/>
                             <Route path="/reset_password_result" element={<ResetPasswordResult/>}/>
                             <Route path="/subscriptions" element={<Subscriptions/>}/>
+
+                            <Route path="/new_st" element={<NewSoundtrack/>}/>
+                            <Route path="/listen_st/:id" element={<ListenST/>}/>
+                            <Route path="/new_pllt" element={<NewPlaylist/>}/>
+                            <Route path="/listen_pllt/:id" element={<ListenPlaylist/>}/>
+                            <Route path="/music" element={<Music/>}/>
+
                         </Routes>
                     </Router>
                 </div>
@@ -209,6 +224,14 @@ export default function App() {
                             <ListItemButton href="/new_post">
                                 <ListItemText>
                                     Создать пост
+                                </ListItemText>
+                            </ListItemButton>
+                        </ListItem>
+
+                        <ListItem>
+                            <ListItemButton href="/music">
+                                <ListItemText>
+                                    Музыка
                                 </ListItemText>
                             </ListItemButton>
                         </ListItem>

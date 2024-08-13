@@ -1,6 +1,6 @@
 import {createContext} from 'react'
 
-export const HOST = 'https://coffeetox.ru'//'http://localhost'// // // //
+export const HOST = 'https://coffeetox.ru'//'http://localhost'////// // // //
 
 export const cfxContext = createContext({
     inspectContent: () => {}
@@ -77,6 +77,10 @@ export function findInputError(errors, name) {
             return cur
         }, {})
     return filtered
+}
+
+export function getFileExtension(file) {
+    return file.name.split('.').pop().toLowerCase()
 }
 
 export function blobToBase64(blob) {
@@ -196,11 +200,14 @@ export const jsonToFormData = (data) => {
     const fd = new FormData()
 
     Object.keys(data).forEach(k => {
-        if(!Array.isArray(data[k])) {
-            fd.append(k, data[k])
+        if(Array.isArray(data[k])) {
+            data[k].forEach(w => fd.append(k, w))
             return
         }
-        data[k].forEach(w => fd.append(k, w))
+        else if(typeof data[k] === 'boolean')
+            fd.append(k, data[k]? 1 : 0)
+        else
+            fd.append(k, data[k])
     })
 
     return fd
@@ -332,4 +339,23 @@ export function loadUserData(tag) {
 
         return data
     })
+}
+
+export function downloadFile(id, filename) {
+    fetch(fileURL(id))
+    .then(response => response.blob())
+    .then(blob => {
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+    })
+}
+
+export function copyText(text) {
+    navigator.clipboard.writeText(text)
+}
+
+export function formatDuration(seconds) {
+    return `${Math.floor(seconds/60)}:${seconds % 60}`
 }

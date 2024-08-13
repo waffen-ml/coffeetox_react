@@ -3,7 +3,9 @@ import { useForm, FormProvider } from 'react-hook-form'
 import {useState} from 'react'
 import { Link, Button } from '@mui/material'
 
-export default function Form({onSubmit, children, submitButtonLabel, hints, methodsRef, defaultValues, values, className}) {
+export default function Form({onSubmit, children, submitButtonLabel,
+  hints, methodsRef, defaultValues, values, className, disableSubmitButton}) {
+
     const methods = useForm({
       defaultValues,
       values
@@ -20,7 +22,8 @@ export default function Form({onSubmit, children, submitButtonLabel, hints, meth
 
     if(methodsRef) {
         methodsRef.current = {
-          getValues: methods.getValues
+          getValues: methods.getValues,
+          handledSubmit
         }
     }
 
@@ -43,7 +46,8 @@ export default function Form({onSubmit, children, submitButtonLabel, hints, meth
                   <li key={i}>
                     <Link
                       onClick={h.action}
-                      href={h.url}
+                      href={h.url ?? "#"}
+                      underline="hover"
                     >
                       {h.label}
                     </Link>
@@ -52,10 +56,13 @@ export default function Form({onSubmit, children, submitButtonLabel, hints, meth
               </ul>
             )}
 
-            <div className="mt-5 mb-6">
-              <Button type="submit" onClick={handledSubmit} variant="contained">{submitButtonLabel ?? 'Submit'}</Button>
-            </div>
 
+            {!disableSubmitButton && (
+              <div className="mt-5 mb-6">
+                <Button type="submit" onClick={handledSubmit} variant="contained">{submitButtonLabel ?? 'Submit'}</Button>
+              </div>
+            )}
+            
           </form>
         </FormProvider>
     

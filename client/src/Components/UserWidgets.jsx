@@ -38,7 +38,7 @@ export function AvatarTagDescriptionWidget({user, description}) {
         <div className="grid gap-x-2 gap-y-0 grid-cols-[auto_1fr] grid-rows-[1fr_1fr]">
             <UserAvatarLink user={user} className="row-span-2"/>
             <UserTagLink user={user}/>
-            <span className="text-gray-600 text-sm mt-[-2px]">{description}</span>
+            <span className="opacity-70 text-sm mt-[-2px]">{description}</span>
         </div>
     )
 }
@@ -48,7 +48,7 @@ export function AvatarNameDescriptionWidget({user, description}) {
         <div className="grid gap-x-2 gap-y-0 grid-cols-[auto_1fr] grid-rows-[1fr_1fr]">
             <UserAvatarLink user={user} className="row-span-2"/>
             <UserNameLink user={user}/>
-            <span className="text-gray-600 text-sm mt-[-2px]">{description}</span>
+            <span className="opacity-70 text-sm mt-[-2px]">{description}</span>
         </div>
     )
 }

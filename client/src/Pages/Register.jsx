@@ -8,10 +8,6 @@ const hints = [
     {
         label: 'Уже есть аккаунт',
         url: '/login'
-    },
-    {
-        label: 'Забыли пароль?',
-        url: '#'
     }
 ]
 

@@ -1,6 +1,9 @@
 import { useContext, createContext, useState, useRef, useEffect } from "react"
 import { Link } from "@mui/material"
 import YoutubePlayer from "./YoutubePlayer"
+import SoundtrackEmbed from "./Music/SoundtrackEmbed"
+import PlaylistEmbed from "./Music/PlaylistEmbed"
+import { CfxBox } from "./CfxBaseComponents"
 
 const ftContext = createContext({addAttachment: () => {}})
 const linkRegex = /(([a-zA-Z]+:\/\/)?(([a-zA-Z0-9\-]+\.)+([a-zA-Z]{2}|aero|arpa|biz|com|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel|local|internal))(:[0-9]{1,5})?(\/[a-zA-Z0-9_\-\.~]+)*(\/([a-zA-Z0-9_\-\.]*)(\?[a-zA-Z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=-_~:@/?]*)?)(\s+|$)/
@@ -35,8 +38,10 @@ const unaryOperators = [
         transform: (m, ctx) => {
             const completedLink = completeLink(m[0])
             const yt = parseYoutubeLink(completedLink)
-
+            const music = parseMusicLink(completedLink)
+            
             if(yt) ctx.addAttachment({type:'youtube', ...yt})
+            if(music) ctx.addAttachment({type: 'music', ...music})
 
             return <Link href={completedLink} target="_blank">{m[0]}</Link>
         }
@@ -62,6 +67,25 @@ function parseYoutubeLink(url){
         id: id,
         shorts: url.includes('shorts')
     }
+}
+
+function parseMusicLink(url) {
+    const match = url.match(/\/listen_([a-z]+)\/(\d+)/)
+
+    if (!match)
+        return null
+
+    const [_, listenType, listenIdStr] = match
+
+    if (listenType != 'pllt' && listenType != 'st')
+        return null
+
+    return {
+        type: 'music',
+        isPlaylist: listenType == 'pllt',
+        id: parseInt(listenIdStr)
+    }
+    
 }
 
 function completeLink(link) {
@@ -207,11 +231,13 @@ function ProcessTagsRec({text, i, j, tag, insideTags}) {
     return tag? tagTransformations[tag](<>{parts}</>) : <>{parts}</>
 }
 
-
 function YoutubeGrid({videos}) {
 
     const shorts = videos.filter(v => v.shorts)
     const plain = videos.filter(v => !v.shorts)
+
+    if (shorts.length + plain.length == 0)
+        return <></>
 
     return (
         <div
@@ -231,6 +257,24 @@ function YoutubeGrid({videos}) {
             ))}
 
         </div>
+    )
+}
+
+function MusicEmbeds({attachments}) {
+    if(attachments.length == 0)
+        return <></>
+
+    return (
+        <ul className="flex flex-col gap-1">
+            {attachments.map((a, i) => (
+                <li key={i}>
+                    <CfxBox>
+                        {a.isPlaylist && <PlaylistEmbed playlistId={a.id} isCompact={true}/>}
+                        {!a.isPlaylist && <SoundtrackEmbed soundtrackId={a.id} isCompact={true}/>}
+                    </CfxBox>
+                </li>
+            ))}
+        </ul>
     )
 }
 
@@ -258,8 +302,11 @@ export default function FormattedText({ title, text, renderAttachments, children
                     {children}
                     <ProcessTagsRec text={text} i={0} j={text.length - 1} insideTags={tags} tag={null}/>
                 </p>
-                {renderAttachments && attachments.length > 0 && (
+                {renderAttachments && (
                     <YoutubeGrid videos={attachments.filter(a => a.type == 'youtube')}/>
+                )}
+                {renderAttachments && (
+                    <MusicEmbeds attachments={attachments.filter(a => a.type == 'music')}/>
                 )}
             </div>
         </ftContext.Provider>

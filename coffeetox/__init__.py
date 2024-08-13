@@ -43,6 +43,7 @@ from coffeetox import polls
 from coffeetox import posts
 from coffeetox import pages
 from coffeetox import email
+from coffeetox import music
 
 db.create_all()
 

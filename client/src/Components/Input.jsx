@@ -4,7 +4,9 @@ import { useState, useRef, useEffect } from 'react'
 import {Link, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Checkbox, Radio, FormControlLabel, RadioGroup} from '@mui/material'
 import FormattedText from "./FormattedText"
 import { trimMultilineText } from "../utils"
-
+import Cropper from 'react-easy-crop'
+import { blobToBase64, cropImageSrc, hostURL, dataURLtoFile, cfxContext, getFileExtension, humanFileSize } from "../utils"
+import {CfxBox} from './CfxBaseComponents'
 
 export const CheckboxInput = ({name, label}) => {
     const { control } = useFormContext()
@@ -67,6 +69,154 @@ export const SimpleInput = ({label, type, name, placeholder, validation, valueTr
             />
         </InputWrapper>
     )
+}
+
+export const AvatarInput = ({label, name, round, validation, maxSizeBytes}) => {
+    const {register, setValue} = useFormContext()
+    const [imageSrc, setImageSrc] = useState(null)
+    const [errorMessage, setErrorMessage] = useState(null)
+    const [isDraggedOver, setDraggedOver] = useState(false)
+    const [crop, setCrop] = useState({ x: 0, y: 0 })
+    const [zoom, setZoom] = useState(1)
+
+    useEffect(() => {
+
+        register(name, {...validation})
+
+    }, [])
+
+    const isJpeg = (f) => f.type == 'image/jpeg'
+
+    const onDragOver = (e) => {
+        e.stopPropagation()
+        e.preventDefault()
+
+        setErrorMessage(null)
+        setDraggedOver(true)
+    }
+
+    const onDragLeave = (e) => {
+        e.stopPropagation()
+        e.preventDefault()
+
+        setDraggedOver(false)
+    }
+
+    const onDrop = (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        
+        const files = [...e.dataTransfer.files]
+
+        setDraggedOver(false)
+
+        if (files.length == 0)
+            return
+        else if (files.length > 1)
+            setErrorMessage({tooMany: true})
+        else if(!isJpeg(files[0]))
+            setErrorMessage({invalidFormat: true})
+        else if(maxSizeBytes && files[0].size > maxSizeBytes)
+            setErrorMessage({tooLarge: true})
+        else {
+            blobToBase64(files[0]).then(setImageSrc)
+        }
+    }
+
+    const browseFile = () => {
+        const inp = document.createElement('input')
+
+        inp.type = 'file'
+        inp.multiple = false
+        inp.accept = '.jpg,.jpeg'
+
+        inp.addEventListener('change', () => {
+
+            const files = [...inp.files]
+
+            if(maxSizeBytes && files[0].size > maxSizeBytes)
+                setErrorMessage({tooLarge: true})
+            else
+                blobToBase64(files[0]).then(setImageSrc)
+
+        })
+
+        inp.click()
+    }
+
+    const onCropComplete = (_, ca) => {
+        cropImageSrc(imageSrc, ca.x, ca.y, ca.width, ca.height, 'image/jpeg')
+        .then(croppedSrc => {
+            const file = dataURLtoFile(croppedSrc, 'avatar.jpg')
+            setValue(name, file)
+        })
+    }
+
+    const resetImage = () => {
+        setValue(name, null)
+        setImageSrc(null)
+    }
+
+    return (
+        <InputWrapper label={label} name={name}>
+            <CfxBox className="max-w-full max-h-full" style={{width: 'max-content'}}>
+                {!imageSrc && (
+                    <div
+                        onDragOver={onDragOver}
+                        onDragLeave={onDragLeave}
+                        onDrop={onDrop}
+                        className={"max-w-full max-h-full w-[250px] h-[150px] flex flex-col justify-center items-center gap-1 border-2 border-gray-400 " + (isDraggedOver? "border-solid" : "border-dashed")}
+                    >
+                        {!isDraggedOver && errorMessage && (
+                            <>
+                                <span className="text-red-600 pointer-events-none text-center">
+                                    {errorMessage.tooMany && "Слишком много файлов!"}
+                                    {errorMessage.invalidFormat && "Принимаются только JPEG изображения!"}
+                                    {errorMessage.tooLarge && `Превышен лимит в ${humanFileSize(maxSizeBytes, true)}!`}
+                                </span>
+
+                                <Button onClick={() => setErrorMessage(null)}>ОК</Button>
+                            </>
+                        )}
+
+                        {!isDraggedOver && !errorMessage && (
+                            <>
+                                <span className="pointer-events-none">Перетащите файлы сюда</span>
+                                <span className="pointer-events-none">или</span>
+                                <Button onClick={browseFile}>Нажмите для обзора</Button>                        
+                            </>
+                        )}
+
+                        {isDraggedOver && (
+                            <span className="pointer-events-none">Отпустите</span>
+                        )}
+                    </div>
+                )}
+
+                {imageSrc && (
+                    <>
+                        <div className="relative max-w-full max-h-full w-[400px] h-[350px]">
+                            <Cropper
+                                image={imageSrc}
+                                crop={crop}
+                                zoom={zoom}
+                                aspect={1}
+                                cropShape={round? 'round' : 'rect'}
+                                onCropChange={setCrop}
+                                onCropComplete={onCropComplete}
+                                onZoomChange={setZoom}
+                                maxZoom={5}
+                                zoomSpeed={0.5}
+                            />
+                        </div>
+                        <Link component="button" underline="hover" onClick={resetImage}>Удалить фото</Link>
+                    </>
+                )}
+            </CfxBox>
+        </InputWrapper>
+    )
+
+
 }
 
 export const TextAreaInput = ({label, name, placeholder, validation, valueTransform}) => {
@@ -134,7 +284,7 @@ export function InputWrapper({name, label, children}) {
         <div className="flex flex-col w-full gap-2">
             {label && (
                 <div className="flex justify-between">
-                    <span className="font-semibold capitalize">
+                    <span className="font-semibold">
                         {label}
                     </span>
                 </div>

@@ -33,4 +33,5 @@
 :root.dark {
     --cfx-box: 186, 142, 110, 0.2;
     background: rgb(59,49,43);
+    color:rgb(236, 224, 209);
 }
