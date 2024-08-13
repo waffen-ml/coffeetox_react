@@ -834,9 +834,9 @@ export default function Post({ data, isCompact}) {
 
     if (isDeleted)
         return (
-            <div className="bg-gray-200 shadow-md rounded-lg p-3 w-full flex flex-col gap-2">
+            <CfxBox className="shadow-md w-full flex flex-col gap-2">
                 Пост был удален.
-            </div>
+            </CfxBox>
         )
 
     return (
