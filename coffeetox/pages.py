@@ -16,5 +16,11 @@ from coffeetox.fs import send_react_app
 @app.route('/reset_password_start')
 @app.route('/reset_password_result')
 @app.route('/subscriptions')
+@app.route('/new_st', methods=['GET'])
+@app.route('/new_pllt', methods=['GET'])
+@app.route('/listen_st/<int:id>')
+@app.route('/listen_pllt/<int:id>')
+@app.route('/music')
+@app.route('/settings')
 def all_render_routes(*args, **kwargs):
     return send_react_app()
