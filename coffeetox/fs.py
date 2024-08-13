@@ -41,6 +41,7 @@ class File(db.Model):
         return get_abspath(cfx_config.user_files_folder, f'{self.id}.{self.extension}')
     
     def to_dict(self):
+        print(self.specifics)
         return {
             'id': self.id,
             'filename': self.filename,
@@ -174,9 +175,9 @@ def get_specifics(file_db):
 
 def save_file(file, **kwargs):
 
+    safe_filename = ''
 
-
-    file_db = File(filename=file.filename.encode(),
+    file_db = File(filename=file.filename,
                 content_type=file.content_type,
                 content_length=file.content_length or get_file_content_length(file), **kwargs)
     
