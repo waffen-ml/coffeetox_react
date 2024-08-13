@@ -3,6 +3,7 @@ import Page from "../../Components/Page";
 import { cfxContext, quickFetch } from "../../utils";
 import PlaylistGrid from "../../Components/Music/PlaylistGrid";
 import Soundtrack from "../../Components/Music/Soundtrack";
+import { Link } from "@mui/material";
 
 export default function Music() {
     const [myPlaylists, setMyPlaylists] = useState(null)
@@ -33,6 +34,9 @@ export default function Music() {
     
     return (
         <Page title="Музыка">
+
+            <Link href="/new_st">Добавить трек</Link>
+            <Link href="/new_pllt">Добавить плейлист</Link>
 
             {myPlaylists && <PlaylistGrid playlists={myPlaylists}/>}
 
