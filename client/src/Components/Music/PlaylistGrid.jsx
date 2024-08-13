@@ -30,7 +30,9 @@ export default function PlaylistGrid({playlists}) {
     return (
         <div className="grid gap-1" style={{gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))'}}>
             {playlists.map((pllt, i) => (
-                <PlaylistTile playlist={pllt} key={i}/>
+                <div className="w-full max-w-[280px]">
+                    <PlaylistTile playlist={pllt} key={i}/>
+                </div>
             ))}
         </div>
     )
