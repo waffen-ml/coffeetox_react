@@ -268,7 +268,7 @@ function MusicEmbeds({attachments}) {
         <ul className="flex flex-col gap-1">
             {attachments.map((a, i) => (
                 <li key={i}>
-                    <CfxBox>
+                    <CfxBox className="max-h-[400px] overflow-y-auto">
                         {a.isPlaylist && <PlaylistEmbed playlistId={a.id} isCompact={true}/>}
                         {!a.isPlaylist && <SoundtrackEmbed soundtrackId={a.id} isCompact={true}/>}
                     </CfxBox>
