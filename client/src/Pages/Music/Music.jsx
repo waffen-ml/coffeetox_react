@@ -34,9 +34,12 @@ export default function Music() {
     
     return (
         <Page title="Музыка">
+            
+            <ul>
+                <li><Link href="/new_st">Добавить трек</Link></li>
+                <li><Link href="/new_pllt">Добавить плейлист</Link></li>
+            </ul>
 
-            <Link href="/new_st">Добавить трек</Link>
-            <Link href="/new_pllt">Добавить плейлист</Link>
 
             {myPlaylists && <PlaylistGrid playlists={myPlaylists}/>}
 
