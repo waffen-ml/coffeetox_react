@@ -12,7 +12,7 @@ export default function ListenPlaylist() {
     const [isLoopEnabled, setLoopEnabled] = useState(false)
 
     useEffect(() => {
-        loadPlaylist(id).then(setData)
+        loadPlaylist(id, isShuffled).then(setData)
     }, [])
 
     if(!data)
