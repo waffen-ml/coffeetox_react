@@ -22,7 +22,7 @@ export default function ListenPlaylist() {
 
     return (
         <Page documentTitle={data.name}>
-            <div className="w-full h-full flex flex-col gap-2">
+            <div className="w-full h-full max-h-[700px] flex flex-col gap-2">
                 <PlaylistHeader
                     playlist={data}
                     isShuffled={isShuffled}
