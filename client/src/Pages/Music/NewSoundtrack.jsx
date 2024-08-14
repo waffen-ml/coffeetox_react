@@ -97,7 +97,7 @@ export default function NewSoundtrack() {
         }
 
         if (data.cover)
-            toSend.cover = cover
+            toSend.cover = data.cover
 
         fetch(hostURL('create_soundtrack'), {
             method: 'POST',
