@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import Page from "../../Components/Page";
 import { cfxContext, quickFetch } from "../../utils";
 import PlaylistGrid from "../../Components/Music/PlaylistGrid";
-import Soundtrack from "../../Components/Music/Soundtrack";
+import { SoundtrackItem } from "../../Components/Music/SoundtrackComponents";
 import { Link } from "@mui/material";
 
 export default function Music() {
@@ -35,7 +35,7 @@ export default function Music() {
     return (
         <Page title="Музыка">
             
-            <ul>
+            <ul className="mb-3">
                 <li><Link href="/new_st">Добавить трек</Link></li>
                 <li><Link href="/new_pllt">Добавить плейлист</Link></li>
             </ul>
@@ -47,7 +47,7 @@ export default function Music() {
                 <ul className="mt-5">
                     {mySoundtracks.map((s, i) => (
                         <li key={i} className="mt-1">
-                            <Soundtrack 
+                            <SoundtrackItem 
                                 soundtrack={s}
                                 onClick={() => location.replace('/listen_st/' + s.id)}
                             />
@@ -55,6 +55,7 @@ export default function Music() {
                     ))} 
                 </ul>
             )}
+            
         </Page>
     )
 }
