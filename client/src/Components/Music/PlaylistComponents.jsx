@@ -70,10 +70,10 @@ export function PlaylistItems({playlist, isLoopEnabled, deleteItem, onPlay, disa
 
             deleteItem(idx)
 
-            if (currentIndex == idx && isLoopEnabled)
-                handlePlay(null, currentIndex)
-            else if(currentIndex == idx && !isLoopEnabled)
+            if (currentIndex == idx && idx + 1 == playlist.soundtracks.length && !isLoopEnabled)
                 setCurrentIndex(-1)
+            else if(currentIndex == idx)
+                handlePlay(null, currentIndex)
             else if (currentIndex > idx)
                 handlePlay(null, currentIndex - 1)
 
