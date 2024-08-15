@@ -67,10 +67,21 @@ export function PlaylistItems({playlist, isLoopEnabled, deleteItem, onPlay, disa
                 throw Error()
 
             const idx = playlist.soundtracks.findIndex(s => s.id == stId)
+            const isLast = idx + 1 == playlist.soundtracks.length
 
+            // delete globally
             deleteItem(idx)
 
-            if (currentIndex == idx && idx + 1 == playlist.soundtracks.length && !isLoopEnabled)
+            // delete locally for handlePlay
+            playlist = {
+                ...playlist,
+                soundtracks: [
+                    ...playlist.soundtracks.slice(0, idx),
+                    ...playlist.soundtracks.slice(idx + 1)
+                ]
+            }
+
+            if (currentIndex == idx && isLast && !isLoopEnabled)
                 setCurrentIndex(-1)
             else if(currentIndex == idx)
                 handlePlay(null, currentIndex)
