@@ -71,9 +71,18 @@ def accept_payments(watch_user_id):
     history = yoomoney_client.operation_history()
     accepted_watched = False
 
-    print(history.operations)
-
     for oper in history.operations:
+        print("Operation:",oper.operation_id)
+        print("\tStatus     -->", oper.status)
+        print("\tDatetime   -->", oper.datetime)
+        print("\tTitle      -->", oper.title)
+        print("\tPattern id -->", oper.pattern_id)
+        print("\tDirection  -->", oper.direction)
+        print("\tAmount     -->", oper.amount)
+        print("\tLabel      -->", oper.label)
+        print("\tType       -->", oper.type)
+        print('-' * 10)
+
         if oper.label not in awaiting_payment:
             continue
 
