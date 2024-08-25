@@ -1,4 +1,4 @@
 coffeetox/coffeetox.db
 coffeetox/user_files/*
 coffeetox/ssl/*
-coffeetox/migrations/versions/*
+coffeetox/migrations/
