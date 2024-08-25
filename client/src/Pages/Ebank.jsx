@@ -196,7 +196,7 @@ export function EbankCard({actions, cardStyle}) {
         return <></>
 
     return (
-        <div className="shadow-lg p-5 overflow-hidden rounded-2xl w-[350px] h-[200px] grid grid-cols-[1fr_auto] grid-rows-2 select-none" style={style}>
+        <div className="shadow-lg p-5 overflow-hidden rounded-2xl w-[350px] h-[200px] grid grid-cols-[1fr_auto] grid-rows-2 select-none" style={{color:'black', background:'gray', ...style}}>
             <p className="text-3xl font-semibold p-1">{labelEBL(currentUser.balance)}</p>
             <p className="font-semibold justify-self-end text-lg">CfxEbank</p>
             <div className="self-end grid grid-cols-[auto_1fr] grid-rows-2 gap-x-2">
