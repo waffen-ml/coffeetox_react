@@ -476,7 +476,7 @@ function CardStyleDialog({isOpen, onClose}) {
                                     {sw.isEquipped && <Button disabled variant="contained">Надето</Button>}
                                     {!sw.isEquipped && <Button onClick={() => handleEquip(sw.cardStyle.id)} variant="contained">Надеть</Button>}
                                 </div>
-                                <div className="col-span-2">
+                                <div className="col-span-2 max-w-full overflow-x-auto">
                                     <EbankCard actions={[]} cardStyle={sw.cardStyle}/>
                                 </div>
                             </CfxBox>
@@ -492,7 +492,7 @@ function CardStyleDialog({isOpen, onClose}) {
                                     {!sw.isPurchased && <Button onClick={() => handlePurchase(sw.cardStyle.id)} variant="contained">Купить</Button>}
                                 </div>
                                 <span className="truncate text-lg">{labelEBL(sw.cardStyle.price)}</span>
-                                <div className="col-span-2 mt-2">
+                                <div className="col-span-2 mt-2 max-w-full overflow-x-auto">
                                     <EbankCard actions={[]} cardStyle={sw.cardStyle}/>
                                 </div>
                             </CfxBox>
