@@ -71,6 +71,8 @@ def accept_payments(watch_user_id):
     history = yoomoney_client.operation_history()
     accepted_watched = False
 
+    print(history.operations)
+
     for oper in history.operations:
         if oper.label not in awaiting_payment:
             continue
@@ -100,13 +102,14 @@ def transfer(from_user, to_user, amount, comment=''):
     transaction = Transaction(from_user=from_user, to_user=to_user,
                               amount=amount, comment=comment)
     
+    db.session.add(transaction)
+
     if from_user is not None:
         from_user.balance -= amount
     
     if to_user is not None:
         to_user.balance += amount
     
-    db.session.add(transaction)
     db.session.commit()
 
     return 'SUCCESS'
