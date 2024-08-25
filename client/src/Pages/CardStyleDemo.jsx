@@ -1,10 +1,12 @@
 import { EbankCard } from "./Ebank";
 import Form from "../Components/Form";
 import { TextAreaInput } from "../Components/Input";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { cfxContext } from "../utils";
 
 export default function CardStyleDemo() {
     const [style, setStyle] = useState({})
+    const {currentUser} = useContext(cfxContext)
 
     const handleUpdate = (style_json) => {
 
@@ -16,6 +18,11 @@ export default function CardStyleDemo() {
         }
 
     }
+
+    if(!currentUser)
+        return <>Загрузка...</>
+    else if(currentUser.id < 0)
+        return <>Необходимо войти в аккаунт!</>
 
     return (
         <div className="flex flex-col gap-2">
