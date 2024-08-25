@@ -72,12 +72,6 @@ def accept_payments(watch_user_id):
     accepted_watched = False
 
     for oper in history.operations:
-        print("Operation:",oper.operation_id)
-        print("Status     -->", oper.status)
-        print("Datetime   -->", oper.datetime)
-        print("Amount     -->", oper.amount)
-        print("Label      -->", oper.label)
-        print('-' * 10)
 
         if oper.label not in awaiting_payment or oper.status != 'success':
             continue
