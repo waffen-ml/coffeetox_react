@@ -20,7 +20,7 @@ export default function CardStyleDemo() {
     }
 
     const handleSubmit = (data) => {
-        fetch(hostURL('/ebank/add_card_style'), {
+        return fetch(hostURL('/ebank/add_card_style'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
