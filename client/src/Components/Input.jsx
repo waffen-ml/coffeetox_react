@@ -48,7 +48,7 @@ export const RadioGroupInput = ({name, label, options}) => {
     )
 }
 
-export const NumericInput = ({label, name, placeholder, validation, allowNegative, isFloat, onChange}) => {
+export const NumericInput = ({label, name, placeholder, validation, allowNegative, isFloat, onChange, valueTransform}) => {
 
     const filter = (ch, value) => {
         if ('0123456789'.includes(ch))
@@ -68,7 +68,10 @@ export const NumericInput = ({label, name, placeholder, validation, allowNegativ
             onChange={onChange}
             placeholder={placeholder} 
             validation={validation}
-            valueTransform={w => !w? 0 : isFloat? parseFloat(w) : parseInt(w)}
+            valueTransform={w => {
+                const t = !w? 0 : isFloat? parseFloat(w) : parseInt(w)
+                return valueTransform? valueTransform(t) : t
+            }}
             characterFilter={filter}
         />
     )

@@ -53,11 +53,11 @@ function AccountTagInput({name, label, placeholder, validation}) {
 
 }
 
-export function EBLInput({name, label, placeholder, validation, onChange}) {
+export function EBLInput({name, label, placeholder, validation, onChange, allowZero}) {
     const v = combineValidations({
         validate: {
-            is_invalid: (v) => !isNaN(v) || "Некорректное значение!",
-            too_small: (v) => v >= 0.01 || "Слишком мало!",
+            is_invalid: (v) => !isNaN(v) && v >= 0 || "Некорректное значение!",
+            too_small: (v) => allowZero || v >= 0.01 || "Слишком мало!",
             too_large: (v) => v <= 1e+6 || "Слишком много!"
         },
         required: {
@@ -75,6 +75,7 @@ export function EBLInput({name, label, placeholder, validation, onChange}) {
             placeholder={placeholder}
             validation={v}
             onChange={onChange}
+            valueTransform={(t) => Math.floor(t * 100) / 100}
         />
     )
 

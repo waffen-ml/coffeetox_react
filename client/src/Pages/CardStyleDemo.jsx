@@ -74,6 +74,7 @@ export default function CardStyleDemo() {
                 <EBLInput
                     name="price"
                     label="Цена (EBL)"
+                    allowZero={true}
                 />
             </Form>
         </div>
