@@ -77,7 +77,7 @@ def accept_payments(watch_user_id):
             continue
 
         data = awaiting_payment.pop(oper.label)
-        user = User.query.get(data.user_id)
+        user = User.query.get(data['user_id'])
 
         if user is None:
             continue
