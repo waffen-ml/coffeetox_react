@@ -182,6 +182,7 @@ def route_buy_ebl(amount):
         targets=f'Купите {amount} EBL',
         paymentType="SB",
         sum=amount * cfx_config.ebl_to_roubles,
+        label=request_uuid
     )
     
     return {
