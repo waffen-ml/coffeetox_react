@@ -73,17 +73,13 @@ def accept_payments(watch_user_id):
 
     for oper in history.operations:
         print("Operation:",oper.operation_id)
-        print("\tStatus     -->", oper.status)
-        print("\tDatetime   -->", oper.datetime)
-        print("\tTitle      -->", oper.title)
-        print("\tPattern id -->", oper.pattern_id)
-        print("\tDirection  -->", oper.direction)
-        print("\tAmount     -->", oper.amount)
-        print("\tLabel      -->", oper.label)
-        print("\tType       -->", oper.type)
+        print("Status     -->", oper.status)
+        print("Datetime   -->", oper.datetime)
+        print("Amount     -->", oper.amount)
+        print("Label      -->", oper.label)
         print('-' * 10)
 
-        if oper.label not in awaiting_payment:
+        if oper.label not in awaiting_payment or oper.status != 'success':
             continue
 
         data = awaiting_payment.pop(oper.label)
