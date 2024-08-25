@@ -186,6 +186,11 @@ export function EbankCard({actions, cardStyle}) {
         .catch(() => setStyle({}))
     }, [currentUser])
 
+    useEffect(() => {
+        if(cardStyle)
+            setStyle(cardStyle.style)
+    }, [cardStyle])
+
     if (!style)
         return <></>
 
