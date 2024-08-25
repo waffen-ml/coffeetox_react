@@ -168,7 +168,7 @@ export default function App() {
                             <Route path="/reset_password_result" element={<ResetPasswordResult/>}/>
                             <Route path="/subscriptions" element={<Subscriptions/>}/>
                             <Route path="/ebank" element={<Ebank/>}/>
-                            <Route path="/card_style_demo" element={<Ebank/>}/>
+                            <Route path="/card_style_demo" element={<CardStyleDemo/>}/>
                             <Route path="/new_st" element={<NewSoundtrack/>}/>
                             <Route path="/listen_st/:id" element={<ListenST/>}/>
                             <Route path="/new_pllt" element={<NewPlaylist/>}/>
