@@ -232,6 +232,15 @@ export default function App() {
                         </ListItem>
 
                         <ListItem>
+                            <ListItemButton href="/ebank">
+                                <ListItemText>
+                                    Ебанк
+                                </ListItemText>
+                            </ListItemButton>
+                        </ListItem>
+
+
+                        <ListItem>
                             <ListItemButton href="/music">
                                 <ListItemText>
                                     Музыка
