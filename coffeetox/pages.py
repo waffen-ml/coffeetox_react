@@ -22,5 +22,6 @@ from coffeetox.fs import send_react_app
 @app.route('/listen_pllt/<int:id>')
 @app.route('/music')
 @app.route('/settings')
+@app.route('/ebank')
 def all_render_routes(*args, **kwargs):
     return send_react_app()
