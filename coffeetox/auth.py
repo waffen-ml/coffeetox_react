@@ -37,10 +37,13 @@ class User(db.Model, UserMixin):
     bio = db.Column(db.String(length=100), default='')
     email = db.Column(db.String(length=50), unique=False, nullable=False)
     password_hash = db.Column(db.String(length=60), nullable=False)
-    balance = db.Column(db.Integer(), nullable=False, default=0)
     last_seen = db.Column(db.DateTime, nullable=False,
                           default=lambda: datetime.datetime.now(datetime.timezone.utc))
     registration_date = db.Column(db.Date, nullable=False, default=lambda: datetime.date.today())
+    balance = db.Column(db.Float(2), nullable=False, default=0)
+
+    equipped_ebank_card_style_id = db.Column(db.Integer, db.ForeignKey('ebank_card_style.id'))
+    equipped_ebank_card_style = db.relationship('EbankCardStyle', lazy=True)
 
     my_posts = db.relationship('Post', backref='author', lazy=True)
     avatar_file_id = db.Column(db.Integer(), db.ForeignKey('file.id'))
@@ -87,6 +90,7 @@ class User(db.Model, UserMixin):
 
         if full:
             out['email'] = self.email
+            out['balance'] = self.balance
             
         return out
     

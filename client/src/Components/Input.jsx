@@ -48,7 +48,34 @@ export const RadioGroupInput = ({name, label, options}) => {
     )
 }
 
-export const SimpleInput = ({label, type, name, placeholder, validation, valueTransform}) => {
+export const NumericInput = ({label, name, placeholder, validation, allowNegative, isFloat, onChange}) => {
+
+    const filter = (ch, value) => {
+        if ('0123456789'.includes(ch))
+            return true
+        if (ch == '.' && isFloat && !value.includes('.'))
+            return true
+        if (ch == '-' && allowNegative && value.length == 0)
+            return true
+        return false
+    }
+
+    return (
+        <SimpleInput
+            label={label} 
+            name={name}
+            type="text"
+            onChange={onChange}
+            placeholder={placeholder} 
+            validation={validation}
+            valueTransform={w => !w? 0 : isFloat? parseFloat(w) : parseInt(w)}
+            characterFilter={filter}
+        />
+    )
+
+}
+
+export const SimpleInput = ({label, type, name, placeholder, validation, valueTransform, onChange, characterFilter}) => {
     const { register } = useFormContext()
 
     if(valueTransform === undefined && type === 'text')
@@ -60,12 +87,19 @@ export const SimpleInput = ({label, type, name, placeholder, validation, valueTr
                 className="w-full p-4 font-medium border rounded-md border-slate-300 placeholder:opacity-60" 
                 type={type}
                 placeholder={placeholder}
-                {...register(
-                    name, {
-                        ...validation,
-                        setValueAs: valueTransform
+                {...register(name, {
+                    ...validation,
+                    setValueAs: valueTransform,
+                    onChange: (e) => {
+                        const val = valueTransform? valueTransform(e.target.value) : e.target.value
+                        if (onChange)
+                            onChange(val, e)
                     }
-                )}
+                })}
+                onKeyDown={(e) => {
+                    if(!e.ctrlKey && e.key.length == 1 && characterFilter && !characterFilter(e.key, e.target.value))
+                        e.preventDefault()
+                }}
             />
         </InputWrapper>
     )

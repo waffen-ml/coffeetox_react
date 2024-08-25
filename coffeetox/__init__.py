@@ -37,6 +37,8 @@ mirgate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
+json_response = lambda success, **kwargs: {'success': success, **kwargs}
+
 from coffeetox import auth
 from coffeetox import fs
 from coffeetox import polls
@@ -44,6 +46,7 @@ from coffeetox import posts
 from coffeetox import pages
 from coffeetox import email
 from coffeetox import music
+from coffeetox import ebank
 
 db.create_all()
 

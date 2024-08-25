@@ -146,7 +146,6 @@ class Playlist(db.Model):
 
 
 
-
 @app.route('/create_soundtrack', methods=['POST'])
 @login_required
 def route_create_soundtrack():

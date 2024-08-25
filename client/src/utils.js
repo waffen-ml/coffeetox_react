@@ -1,6 +1,6 @@
 import {createContext} from 'react'
 
-export const HOST = 'https://coffeetox.ru'//'http://localhost'////////// // // //
+export const HOST = 'https://coffeetox.ru'//'http://localhost'////////////// // // //
 
 export const cfxContext = createContext({
     inspectContent: () => {}
@@ -361,4 +361,21 @@ export function formatDuration(seconds) {
     const s = seconds % 60
 
     return String(m).padStart(2, "0") + ':' + String(s).padStart(2, "0")
+}
+
+export function labelEBL(ebl) {
+    return `${ebl.toFixed(2)} EBL`
+}
+
+export function combineValidations(v1, v2) {
+    v1 ??= {}
+    v2 ??= {}
+
+    const validate = {...v1.validate??{}, ...v2.validate??{}}
+
+    return {
+        ...v1,
+        ...v2,
+        validate
+    }
 }

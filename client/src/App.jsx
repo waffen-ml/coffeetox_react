@@ -14,6 +14,7 @@ import NewSoundtrack from './Pages/Music/NewSoundtrack'
 import NewPlaylist from './Pages/Music/NewPlaylist'
 import ListenPlaylist from './Pages/Music/ListenPlaylist'
 import Music from './Pages/Music/Music'
+import Ebank from './Pages/Ebank'
 
 import Subscriptions from './Pages/Subscriptions'
 import ResetPassword from './Pages/ResetPassword'
@@ -138,6 +139,7 @@ export default function App() {
                         <li><Link href="/?subscribed_only=1">Подписки</Link></li>
                         <li><Link href="/new_post">Создать пост</Link></li>
                         <li><Link href="/music">Музыка</Link></li>
+                        <li><Link href="/ebank">Ебанк</Link></li>
                         <li><Link href="/settings">Настройки</Link></li>
                         <li><Link href="/capytaire">Каписьянс</Link></li>
                     </ul>
@@ -165,7 +167,7 @@ export default function App() {
                             <Route path="/reset_password_start" element={<ResetPassword/>}/>
                             <Route path="/reset_password_result" element={<ResetPasswordResult/>}/>
                             <Route path="/subscriptions" element={<Subscriptions/>}/>
-
+                            <Route path="/ebank" element={<Ebank/>}/>
                             <Route path="/new_st" element={<NewSoundtrack/>}/>
                             <Route path="/listen_st/:id" element={<ListenST/>}/>
                             <Route path="/new_pllt" element={<NewPlaylist/>}/>
