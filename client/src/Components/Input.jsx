@@ -253,7 +253,7 @@ export const AvatarInput = ({label, name, round, validation, maxSizeBytes}) => {
 
 }
 
-export const TextAreaInput = ({label, name, placeholder, validation, valueTransform}) => {
+export const TextAreaInput = ({label, name, placeholder, validation, valueTransform, onChange}) => {
     const { register } = useFormContext()
 
     if(valueTransform === undefined)
@@ -268,7 +268,12 @@ export const TextAreaInput = ({label, name, placeholder, validation, valueTransf
                 {...register(
                     name, {
                         ...validation,
-                        setValueAs: valueTransform
+                        setValueAs: valueTransform,
+                        onChange: (e) => {
+                            const val = valueTransform? valueTransform(e.target.value) : e.target.value
+                            if (onChange)
+                                onChange(val, e)
+                        }
                     }
                 )}
             >

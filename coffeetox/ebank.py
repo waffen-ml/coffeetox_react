@@ -292,3 +292,29 @@ def route_equip_card_style(style_id):
     return json_response(True)
 
 
+@app.route('/ebank/add_card_style', methods=['POST'])
+def route_add_card_style():
+    name = request.json['name']
+    style_json = request.json['style_json']
+    price = request.json['price']
+
+    s = EbankCardStyle(name=name, price=price, style_json=style_json)
+
+    db.session.add(s)
+    db.session.commit()
+
+    return json_response(True, id=s.id)
+
+
+@app.route('/ebank/delete_card_style/<int:style_id>')
+def route_delete_card_style(style_id):
+    style = EbankCardStyle.query.get(style_id)
+
+    if not style:
+        return json_response(False, error="STYLE_NOT_FOUND")
+    
+    db.session.delete(style)
+    db.session.commit()
+
+    return json_response(True)
+

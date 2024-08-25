@@ -53,7 +53,7 @@ function AccountTagInput({name, label, placeholder, validation}) {
 
 }
 
-function EBLInput({name, label, placeholder, validation, onChange}) {
+export function EBLInput({name, label, placeholder, validation, onChange}) {
     const v = combineValidations({
         validate: {
             is_invalid: (v) => !isNaN(v) || "Некорректное значение!",

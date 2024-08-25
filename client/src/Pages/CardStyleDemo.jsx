@@ -1,23 +1,44 @@
-import { EbankCard } from "./Ebank";
+import { EbankCard, EBLInput } from "./Ebank";
 import Form from "../Components/Form";
-import { TextAreaInput } from "../Components/Input";
+import { TextAreaInput, SimpleInput } from "../Components/Input";
 import { useState, useContext } from "react";
-import { cfxContext } from "../utils";
+import { cfxContext, hostURL } from "../utils";
 
 export default function CardStyleDemo() {
     const [style, setStyle] = useState({})
+    const [styleError, setStyleError] = useState(false)
     const {currentUser} = useContext(cfxContext)
 
-    const handleUpdate = (style_json) => {
-
+    const handleStyleChange = (json) => {
         try {
-            setStyle(JSON.parse(style_json))
+            setStyle(JSON.parse(json))
+            setStyleError(false)
         }
         catch {
-            alert('Неверный стиль!')
+            setStyleError(true)
         }
-
     }
+
+    const handleSubmit = (data) => {
+        fetch(hostURL('/ebank/add_card_style'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: data.name,
+                price: data.price,
+                style_json: JSON.stringify(style)
+            })
+        })
+        .then(r => r.json())
+        .then(r => {
+            if(!r.success)
+                throw Error()
+            return 'Стиль успешно добавлен! ID: ' + r.id
+        })
+        .catch(() => 'Ошибка!')
+    } 
 
     if(!currentUser)
         return <>Загрузка...</>
@@ -27,12 +48,32 @@ export default function CardStyleDemo() {
     return (
         <div className="flex flex-col gap-2">
             <EbankCard actions={[]} cardStyle={{style}}/>
-            <span className="mb-5">{JSON.stringify(style)}</span>
-            <Form submitButtonLabel="Применить" onSubmit={(d) => handleUpdate(d.style_json)}>
+            {styleError && <span>Ошибка стилизации!</span>}
+            <Form submitButtonLabel="Добавить" onSubmit={handleSubmit} defaultValues={{price:0}}>
                 <TextAreaInput 
                     label="JSON-объект стиля"
                     name="style_json"
                     placeholder="{background:white}"
+                    onChange={handleStyleChange}
+                />
+                <SimpleInput
+                    label="Имя стиля"
+                    name="name"
+                    placeholder="Стандарт"
+                    validation={{
+                        required: {
+                            value:true,
+                            message:'Необходимо заполнить!'
+                        },
+                        maxLength: {
+                            value:100,
+                            message: 'Превышен лимит в 100 символов!'
+                        }
+                    }}
+                />
+                <EBLInput
+                    name="price"
+                    label="Цена (EBL)"
                 />
             </Form>
         </div>
