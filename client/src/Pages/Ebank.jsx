@@ -170,7 +170,7 @@ function TransferForm({onCancel, onSuccess}) {
 
 }
 
-function EbankCard({actions, cardStyle}) {
+export function EbankCard({actions, cardStyle}) {
     const { currentUser } = useContext(cfxContext)
     const [style, setStyle] = useState(cardStyle? cardStyle.style : null) 
 

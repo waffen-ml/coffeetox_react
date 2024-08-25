@@ -15,7 +15,7 @@ import NewPlaylist from './Pages/Music/NewPlaylist'
 import ListenPlaylist from './Pages/Music/ListenPlaylist'
 import Music from './Pages/Music/Music'
 import Ebank from './Pages/Ebank'
-
+import CardStyleDemo from './Pages/CardStyleDemo'
 import Subscriptions from './Pages/Subscriptions'
 import ResetPassword from './Pages/ResetPassword'
 import ResetPasswordResult from './Pages/ResetPasswordResult'
@@ -168,6 +168,7 @@ export default function App() {
                             <Route path="/reset_password_result" element={<ResetPasswordResult/>}/>
                             <Route path="/subscriptions" element={<Subscriptions/>}/>
                             <Route path="/ebank" element={<Ebank/>}/>
+                            <Route path="/card_style_demo" element={<Ebank/>}/>
                             <Route path="/new_st" element={<NewSoundtrack/>}/>
                             <Route path="/listen_st/:id" element={<ListenST/>}/>
                             <Route path="/new_pllt" element={<NewPlaylist/>}/>

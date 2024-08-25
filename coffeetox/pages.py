@@ -23,5 +23,6 @@ from coffeetox.fs import send_react_app
 @app.route('/music')
 @app.route('/settings')
 @app.route('/ebank')
+@app.route('/card_style_demo')
 def all_render_routes(*args, **kwargs):
     return send_react_app()
