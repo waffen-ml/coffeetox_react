@@ -1,6 +1,7 @@
 import { EbankCard } from "./Ebank";
 import Form from "../Components/Form";
 import { TextAreaInput } from "../Components/Input";
+import { useState } from "react";
 
 export default function CardStyleDemo() {
     const [style, setStyle] = useState({})
