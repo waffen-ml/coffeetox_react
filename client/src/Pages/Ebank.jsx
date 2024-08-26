@@ -321,7 +321,7 @@ function BuyEblDialog({isOpen, onClose}) {
     const handleBuy = (amount) => {
         quickFetch('/ebank/buy_ebl/' + amount.toFixed(2))
         .then(r => {
-            location.replace(r.url)
+            setTimeout(() => location.replace(r.url), 400)
         })
         .catch(() => alert('Ошибка...'))
     }

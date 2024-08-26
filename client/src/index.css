@@ -35,3 +35,7 @@
     background: rgb(59,49,43);
     color:rgb(236, 224, 209);
 }
+
+:root.dark input {
+    color:black;
+}
