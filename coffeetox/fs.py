@@ -58,8 +58,8 @@ class File(db.Model):
         db.session.commit()
 
 
-def react_app_dir(path):
-    return os.path.join(site_dir, config.react_app_folder, 'dist', path)
+def react_app_dir(*path):
+    return os.path.join(site_dir, config.react_app_folder, 'dist', *path)
 
 
 def send_react_app():
@@ -69,7 +69,8 @@ def send_react_app():
 # shortcut
 @app.route('/assets/<path:path_to_file>')
 def route_react_assets(path_to_file):
-    path = react_app_dir('/assets/' + path_to_file)
+    path = react_app_dir('assets', path_to_file)
+    print(path)
     mimetype = 'text/javascript' if path_to_file.endswith('.js') else mimetypes.guess_type(path)[0]
     return send_file(path, mimetype=mimetype)
 
