@@ -202,6 +202,7 @@ def route_new_post():
             fwd_post.post_fwds.append(post)
 
     for file in files:
+        print('hey')
         save_file(file, origin_post=post)
 
     db.session.commit()
