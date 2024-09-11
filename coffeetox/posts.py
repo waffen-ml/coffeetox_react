@@ -201,8 +201,9 @@ def route_new_post():
         if fwd_post is not None:
             fwd_post.post_fwds.append(post)
 
+    print(files)
+
     for file in files:
-        print('hey')
         save_file(file, origin_post=post)
 
     db.session.commit()
