@@ -3,7 +3,7 @@ feed_limit = 4
 bcrypt_salt = 5
 host = "0.0.0.0"
 
-dev = True
+dev = False
 
 if dev:
     email_confirmation = True

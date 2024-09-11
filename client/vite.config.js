@@ -5,8 +5,5 @@ import path from "path"
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  build: {
-    emptyOutDir: true,
-    outDir: __dirname + '/../coffeetox/react_build/'
-  }
+  build: {}
 })
