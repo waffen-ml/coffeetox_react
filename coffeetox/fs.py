@@ -70,7 +70,6 @@ def send_react_app():
 @app.route('/assets/<path:path_to_file>')
 def route_react_assets(path_to_file):
     path = react_app_dir('assets', path_to_file)
-    print(path)
     mimetype = 'text/javascript' if path_to_file.endswith('.js') else mimetypes.guess_type(path)[0]
     return send_file(path, mimetype=mimetype)
 
@@ -196,6 +195,8 @@ def save_file(file, **kwargs):
         os.mkdir(config.user_files_folder)
 
     file.save(file_db.path)
+
+    print(file_db.path)
 
     specifics = get_specifics(file_db)
 
