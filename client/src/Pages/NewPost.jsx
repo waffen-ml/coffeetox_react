@@ -210,7 +210,6 @@ export default function NewPost() {
     }, [])
 
     const onSubmit = (data) => {
-
         const toSend = {
             title: data.title,
             body: data.body,

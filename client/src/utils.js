@@ -215,25 +215,6 @@ export function isIterable(obj) {
     return typeof obj[Symbol.iterator] === 'function'
 }
 
-export function jsonToFormData(data) {
-    const fd = new FormData()
-
-    Object.keys(data).forEach(k => {
-        if (Array.isArray(data[k])) {
-            console.log(data[k])
-            return
-        }
-        else if(typeof data[k] === 'boolean')
-            fd.append(k, data[k]? 1 : 0)
-        else if(typeof data[k] === null)
-            return
-        else
-            fd.append(k, data[k])
-    })
-
-    return fd
-}
-
 export const trimMultilineText = (s) => {
     return s.replace(/^(\n|\ )+|(\n|\ )+$/g, '')
 }
@@ -342,6 +323,25 @@ export function nItemsLabel(n, a, b, c, hideOne) {
     if(n == 1 && hideOne)
         return form
     return n + ' ' + form
+}
+
+export function jsonToFormData(data) {
+    const fd = new FormData()
+
+    Object.keys(data).forEach(k => {
+        if (Array.isArray(data[k])) {
+            data[k].forEach(w => fd.append(k, w))
+            return
+        }
+        else if(typeof data[k] === 'boolean')
+            fd.append(k, data[k]? 1 : 0)
+        else if(typeof data[k] === null)
+            return
+        else
+            fd.append(k, data[k])
+    })
+
+    return fd
 }
 
 export function quickFetch(url, params) {
