@@ -62,11 +62,9 @@ class Soundtrack(db.Model):
             return
 
         if self.cover_file:
-            self.cover_file.delete_content()
-            db.session.delete(self.cover_file)
+            self.cover_file.delete()
         
-        self.music_file.delete_content()
-        db.session.delete(self.music_file)
+        self.music_file.delete()
 
         self.is_deleted = True
 
@@ -112,8 +110,7 @@ class Playlist(db.Model):
 
     def delete(self):
         if self.cover_file:
-            self.cover_file.delete_content()
-            db.session.delete(self.cover_file)
+            self.cover_file.delete()
 
         self.soundtracks = []
 

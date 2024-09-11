@@ -83,8 +83,7 @@ class Post(db.Model):
             db.session.delete(c)
 
         for f in self.files:
-            f.delete_content()
-            db.session.delete(f)
+            f.delete()
 
         self.is_deleted = True
 
