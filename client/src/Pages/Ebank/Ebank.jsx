@@ -1,82 +1,17 @@
-import Page from '../Components/Page'
-import { CfxBox } from '../Components/CfxBaseComponents'
+import Page from '../../Components/Page'
+import { CfxBox } from '../../Components/CfxBaseComponents'
 import { useContext, useState, useEffect, useRef } from 'react'
-import { cfxContext, hostURL, quickFetch, labelEBL, fileURL, getPostDatetimeLabel, combineValidations} from '../utils'
-import Form from "../Components/Form/Form"
-import { SimpleInput, NumericInput } from "../Components/Form/Input"
-import { AvatarTagWidget } from '../Components/UserWidgets'
-import { Button, Link, Avatar, Pagination, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Tabs, Tab } from '@mui/material'
+import { cfxContext, hostURL, quickFetch, labelEBL, getPostDatetimeLabel} from '../../utils'
+import Form from "../../Components/Form/Form"
+import { SimpleInput, EBLInput, SmartAccountTagInput } from "../../Components/Form/Input"
+import { AvatarTagWidget } from '../../Components/UserWidgets'
+import { Button, Link, Pagination, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Tabs, Tab } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear';
+import EbankCard from '../../Components/Ebank/EbankCard'
+
 
 const TRANSACTIONS_PER_PAGE = 8
 
-
-function AccountTagInput({name, label, placeholder, validation}) {
-    const [foundUser, setFoundUser] = useState(null)
-
-    const handleChange = (val) => {
-        quickFetch('/auth/user/json/' + val)
-        .then(u => setFoundUser(u))
-        .catch(() => setFoundUser(null))
-    }
-
-    const checkFound = (w) => {
-        if (w == "")
-            return true
-
-        return quickFetch('/auth/user/json/' + w)
-            .then(() => true)
-            .catch(() => "Не удалось найти пользователя!")
-    }
-
-    const v = combineValidations({validate:{checkFound}}, validation)
-
-    return (
-        <>
-            <SimpleInput 
-                name={name}
-                label={label}
-                placeholder={placeholder}
-                validation={v}
-                onChange={handleChange}
-            />
-            {foundUser && (
-                <CfxBox>
-                    <AvatarTagWidget user={foundUser}/>
-                </CfxBox>
-            )}
-        </>
-    )
-
-}
-
-export function EBLInput({name, label, placeholder, validation, onChange, allowZero}) {
-    const v = combineValidations({
-        validate: {
-            is_invalid: (v) => !isNaN(v) && v >= 0 || "Некорректное значение!",
-            too_small: (v) => allowZero || v >= 0.01 || "Слишком мало!",
-            too_large: (v) => v <= 1e+6 || "Слишком много!"
-        },
-        required: {
-            message: 'Необходимо заполнить!',
-            value: true
-        }
-    }, validation)
-
-    return (
-        <NumericInput
-            name={name}
-            label={label}
-            isFloat={true}
-            allowNegative={false}
-            placeholder={placeholder}
-            validation={v}
-            onChange={onChange}
-            valueTransform={(t) => Math.floor(t * 100) / 100}
-        />
-    )
-
-}
 
 function SuccessfulTransfer({transfer, onDelete}) {
     return (
@@ -125,7 +60,7 @@ function TransferForm({onCancel, onSuccess}) {
                     <Button variant="outlined" onClick={onCancel}>Отмена</Button>
                 ]}
             >
-                <AccountTagInput 
+                <SmartAccountTagInput 
                     label="Получатель"
                     name="dest_tag"
                     placeholder="capybara"
@@ -164,61 +99,6 @@ function TransferForm({onCancel, onSuccess}) {
             </Form>
         </CfxBox>
 
-    )
-
-}
-
-export function EbankCard({actions, cardStyle}) {
-    const { currentUser } = useContext(cfxContext)
-    const [style, setStyle] = useState(cardStyle? cardStyle.style : null) 
-
-    useEffect(() => {
-        if (cardStyle)
-            return
-        quickFetch('/ebank/get_equipped_card_style')
-        .then(r => {
-            if(!r.success)
-                throw Error()
-            setStyle(r.card_style.style)
-        })
-        .catch(() => setStyle({}))
-    }, [currentUser])
-
-    useEffect(() => {
-        if(cardStyle)
-            setStyle(cardStyle.style)
-    }, [cardStyle])
-
-    if (!style)
-        return <></>
-
-    return (
-        <div className="shadow-lg p-5 overflow-hidden rounded-2xl w-[350px] h-[200px] grid grid-cols-[1fr_auto] grid-rows-2 select-none" style={{color:'black', background:'gray', ...style}}>
-            <p className="text-3xl font-semibold p-1">{labelEBL(currentUser.balance)}</p>
-            <p className="font-semibold justify-self-end text-lg">CfxEbank</p>
-            <div className="self-end grid grid-cols-[auto_1fr] grid-rows-2 gap-x-2">
-                <div className="row-span-2 self-center">
-                    <Avatar src={fileURL(currentUser.avatar_file_id)} sx={{width:42, height:42}}/>
-                </div>
-                <p className="truncate font-semibold">{currentUser.username}</p>
-                <p className="truncate">@{currentUser.tag}</p>
-            </div>
-            <div className="self-end">
-                <ul className="flex flex-col items-end">
-                    {actions.map((a, i) => (
-                        <li key={i}>
-                            <Link 
-                                sx={{color: style.color ?? "black" }}
-                                component="button"
-                                onClick={a.action}
-                            >
-                                {a.label}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </div>
     )
 
 }
@@ -360,7 +240,6 @@ function BuyEblDialog({isOpen, onClose}) {
     )
 
 }
-
 
 function CardStyleDialog({isOpen, onClose}) {
     const { currentUser, updateUserData } = useContext(cfxContext)
@@ -589,3 +468,4 @@ export default function Ebank() {
     )
 
 }
+

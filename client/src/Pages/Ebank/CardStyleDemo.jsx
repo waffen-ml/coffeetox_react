@@ -1,8 +1,10 @@
-import { EbankCard, EBLInput } from "./Ebank";
-import Form from "../Components/Form/Form";
-import { TextAreaInput, SimpleInput } from "../Components/Form/Input";
+import { EBLInput } from "../../Components/Form/Input";
+import EbankCard from "../../Components/Ebank/EbankCard";
+import Form from "../../Components/Form/Form";
+import { TextAreaInput, SimpleInput } from "../../Components/Form/Input";
 import { useState, useContext } from "react";
-import { cfxContext, hostURL } from "../utils";
+import { cfxContext, hostURL } from "../../utils";
+
 
 export default function CardStyleDemo() {
     const [style, setStyle] = useState({})

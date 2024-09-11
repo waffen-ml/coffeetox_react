@@ -68,6 +68,28 @@ class EbankCardStyle(db.Model):
         return user.id is not None and user.equipped_ebank_card_style == self
 
 
+class EbankFundraising(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    title = db.Column(db.String(100))
+    goal = db.Column(db.Float(2), nullable=False)
+    raised = db.Column(db.Float(2), default=0)
+    creator_id = db.Column(db.Integer(), db.ForeignKey('user.id'))
+    creator = db.relationship('User')
+
+    @property
+    def remain(self):
+        return self.goal - self.raised
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'goal': self.goal,
+            'raised': self.raised,
+            'creator': self.creator.to_dict()
+        }
+
+
 def accept_payments(watch_user_id):
     history = yoomoney_client.operation_history()
     accepted_watched = False
@@ -321,4 +343,57 @@ def route_delete_card_style(style_id):
     db.session.commit()
 
     return json_response(True)
+
+
+@app.route('/ebank/create_fundraising', methods=['POST'])
+@login_required
+def route_create_fundraising():
+    title = request.json.get('title')
+    goal = round(request.json.get('goal'), 2)
+
+    if goal == 0 or goal > 1e+6:
+        return json_response(False, error='INVALID_DATA')
+
+    fundraising = EbankFundraising(title=title, goal=goal, creator_id=current_user.id)
+
+    db.session.add(fundraising)
+    db.session.commit()
+
+    return json_response(True, id=fundraising.id)
+
+
+@app.route('/ebank/fundraising/<int:id>')
+def route_fundraising(id):
+    fundraising = EbankFundraising.query.get(id)
+
+    if fundraising is None:
+        return json_response(False, error='NOT_FOUND')
+    
+    return json_response(True, fundraising=fundraising.to_dict())
+
+
+@app.route('/ebank/donate_fundraising/<int:id>/<float:amount>')
+@login_required
+def route_donate_fundraising(id, amount):
+    fundraising = EbankFundraising.query.get(id)
+
+    if fundraising is None:
+        return json_response(False, error='FUNDRAISING_NOT_FOUND')
+    
+    if fundraising.remain == 0:
+        return json_response(False, error='FULLY_RAISED')
+
+    amount = min(amount, fundraising.remain)
+    status = transfer(current_user, fundraising.creator, amount, 'Пожертвование')
+
+    if status == 'SUCCESS':
+        fundraising.raised = round(amount + fundraising.raised, 2)
+        db.session.commit()
+
+        return json_response(True, amount=amount, raised=fundraising.raised)
+
+    return json_response(False, error=status)
+
+
+
 

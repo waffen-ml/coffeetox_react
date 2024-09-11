@@ -11,8 +11,6 @@ import NewSoundtrack from './Pages/Music/NewSoundtrack'
 import NewPlaylist from './Pages/Music/NewPlaylist'
 import ListenPlaylist from './Pages/Music/ListenPlaylist'
 import Music from './Pages/Music/Music'
-import Ebank from './Pages/Ebank'
-import CardStyleDemo from './Pages/CardStyleDemo'
 import Subscriptions from './Pages/Subscriptions'
 import { cfxContext, hostURL, fileURL } from './utils'
 import { useEffect, useState, useRef} from 'react'
@@ -23,6 +21,12 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Avatar, Link, Button, IconButton, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box} from '@mui/material'
 import {ThemeProvider, createTheme} from '@mui/material/styles'
+
+
+import Ebank from './Pages/Ebank/Ebank'
+import CreateEbankFundraising from './Pages/Ebank/CreateEbankFundraising'
+import CardStyleDemo from './Pages/Ebank/CardStyleDemo'
+
 
 import ResetPassword from './Pages/Auth/ResetPassword'
 import ConfirmEmail from './Pages/Auth/ConfirmEmail'
@@ -157,13 +161,15 @@ export default function App() {
                             <Route path="/capytaire" element={<Capytaire nSuits={4} />} />
                             <Route path="/ft_test" element={<FormattedTextTest/>} />
                             <Route path="/subscriptions" element={<Subscriptions/>}/>
-                            <Route path="/ebank" element={<Ebank/>}/>
-                            <Route path="/card_style_demo" element={<CardStyleDemo/>}/>
                             <Route path="/new_st" element={<NewSoundtrack/>}/>
                             <Route path="/listen_st/:id" element={<ListenST/>}/>
                             <Route path="/new_pllt" element={<NewPlaylist/>}/>
                             <Route path="/listen_pllt/:id" element={<ListenPlaylist/>}/>
                             <Route path="/music" element={<Music/>}/>
+
+                            <Route path="/ebank" element={<Ebank/>}/>
+                            <Route path="/card_style_demo" element={<CardStyleDemo/>}/>
+                            <Route path="/create_ebank_fundraising" element={<CreateEbankFundraising/>}/>
 
                             <Route path="/confirm_email/:action/:key" element={<ConfirmEmail/>}/>
                             <Route path="/reset_password/:key" element={<ResetPassword/>}/>

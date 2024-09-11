@@ -1,11 +1,9 @@
 import { useFormContext, Controller, useController } from "react-hook-form"
-import { findInputError, isFormInvalid } from "../../utils"
 import { useState, useRef, useEffect } from 'react'
 import {Link, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Checkbox, Radio, FormControlLabel, RadioGroup, Select, MenuItem} from '@mui/material'
 import FormattedText from "../FormattedText"
-import { trimMultilineText } from "../../utils"
 import Cropper from 'react-easy-crop'
-import { blobToBase64, cropImageSrc, hostURL, dataURLtoFile, cfxContext, getFileExtension, humanFileSize } from "../../utils"
+import { findInputError, isFormInvalid, blobToBase64, cropImageSrc, dataURLtoFile, trimMultilineText, humanFileSize, quickFetch, combineValidations} from "../../utils"
 import {CfxBox} from '../CfxBaseComponents'
 
 
@@ -380,5 +378,74 @@ export function InputWrapper({name, label, children}) {
         </div>
     )
 }
+
+export function SmartAccountTagInput({name, label, placeholder, validation}) {
+    const [foundUser, setFoundUser] = useState(null)
+
+    const handleChange = (val) => {
+        quickFetch('/auth/user/json/' + val)
+        .then(u => setFoundUser(u))
+        .catch(() => setFoundUser(null))
+    }
+
+    const checkFound = (w) => {
+        if (w == "")
+            return true
+
+        return quickFetch('/auth/user/json/' + w)
+            .then(() => true)
+            .catch(() => "Не удалось найти пользователя!")
+    }
+
+    const v = combineValidations({validate:{checkFound}}, validation)
+
+    return (
+        <>
+            <SimpleInput 
+                name={name}
+                label={label}
+                placeholder={placeholder}
+                validation={v}
+                onChange={handleChange}
+            />
+            {foundUser && (
+                <CfxBox>
+                    <AvatarTagWidget user={foundUser}/>
+                </CfxBox>
+            )}
+        </>
+    )
+}
+
+export function EBLInput({name, label, placeholder, validation, onChange, allowZero}) {
+    const v = combineValidations({
+        validate: {
+            is_invalid: (v) => !isNaN(v) && v >= 0 || "Некорректное значение!",
+            too_small: (v) => allowZero || v >= 0.01 || "Слишком мало!",
+            too_large: (v) => v <= 1e+6 || "Слишком много!"
+        },
+        required: {
+            message: 'Необходимо заполнить!',
+            value: true
+        }
+    }, validation)
+
+    return (
+        <NumericInput
+            name={name}
+            label={label}
+            isFloat={true}
+            allowNegative={false}
+            placeholder={placeholder}
+            validation={v}
+            onChange={onChange}
+            valueTransform={(t) => Math.floor(t * 100) / 100}
+        />
+    )
+
+}
+
+
+
 
 

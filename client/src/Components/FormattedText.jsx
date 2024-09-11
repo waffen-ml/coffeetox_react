@@ -3,6 +3,7 @@ import { Link } from "@mui/material"
 import YoutubePlayer from "./YoutubePlayer"
 import SoundtrackEmbed from "./Music/SoundtrackEmbed"
 import PlaylistEmbed from "./Music/PlaylistEmbed"
+import EbankFundraisingEmbed from "./Ebank/EbankFundraisingEmbed"
 import { CfxBox } from "./CfxBaseComponents"
 
 const ftContext = createContext({addAttachment: () => {}})
@@ -22,12 +23,6 @@ const unaryOperators = [
         transform: () => <br/>
     },
     {
-        regex: '\@([A-Za-z0-9_]*)(?=\n|\ |$)',
-        transform: (m) => {
-            return <Link href={`/user/${m[1]}`} target="_blank">@{m[1]}</Link>
-        }
-    },
-    {
         regex: /\[([^\]]+)\]:\[([^\]]+)\]/,
         transform: (m) => {
             return <Link href={m[2]} target="_blank">{m[1]}</Link>
@@ -44,6 +39,19 @@ const unaryOperators = [
             if(music) ctx.addAttachment({type: 'music', ...music})
 
             return <Link href={completedLink} target="_blank">{m[0]}</Link>
+        }
+    },
+    {
+        regex: '\@([A-Za-z0-9_]*)(?=\n|\ |$)',
+        transform: (m) => {
+            return <Link href={`/user/${m[1]}`} target="_blank">@{m[1]}</Link>
+        }
+    },
+    {
+        regex: /\{ebank-fundraising-(\d+)\}/,
+        transform: (m, ctx) => {
+            ctx.addAttachment({type: 'ebank_fundraising', id: parseInt(m[1])})
+            return <></>
         }
     },
     {
@@ -278,6 +286,21 @@ function MusicEmbeds({attachments}) {
     )
 }
 
+function EbankFundraisingAttachments({attachments}) {
+    if(attachments.length == 0)
+        return <></>
+
+    return (
+        <ul className="w-full flex flex-col gap-1">
+            {attachments.map((a, i) => (
+                <li className="w-full" key={i}>
+                    <EbankFundraisingEmbed id={a.id}/>
+                </li>
+            ))}
+        </ul>
+    )
+}
+
 export default function FormattedText({ title, text, renderAttachments, children}) {
     const [attachments, setAttachments] = useState([])
     const attachmentsLoader = []
@@ -303,10 +326,11 @@ export default function FormattedText({ title, text, renderAttachments, children
                     <ProcessTagsRec text={text} i={0} j={text.length - 1} insideTags={tags} tag={null}/>
                 </p>
                 {renderAttachments && (
-                    <YoutubeGrid videos={attachments.filter(a => a.type == 'youtube')}/>
-                )}
-                {renderAttachments && (
-                    <MusicEmbeds attachments={attachments.filter(a => a.type == 'music')}/>
+                    <>
+                        <YoutubeGrid videos={attachments.filter(a => a.type == 'youtube')}/>
+                        <MusicEmbeds attachments={attachments.filter(a => a.type == 'music')}/>
+                        <EbankFundraisingAttachments attachments={attachments.filter(a => a.type == 'ebank_fundraising')} />
+                    </>
                 )}
             </div>
         </ftContext.Provider>
