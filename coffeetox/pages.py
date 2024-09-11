@@ -24,5 +24,6 @@ from coffeetox.fs import send_react_app
 @app.route('/settings')
 @app.route('/ebank')
 @app.route('/card_style_demo')
+@app.route('/create_ebank_fundraising')
 def all_render_routes(*args, **kwargs):
     return send_react_app()
