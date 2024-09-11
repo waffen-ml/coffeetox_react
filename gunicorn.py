@@ -5,7 +5,7 @@ max_requests = 1000
 threads = 5
 workers = 5
 wsgi_app = 'coffeetox:app'
-keyfile = './coffeetox/ssl/privkey.pem'
-certfile = './coffeetox/ssl/fullchain.pem'
+keyfile = './ssl/privkey.pem'
+certfile = './ssl/fullchain.pem'
 preload_app = True
 
