@@ -1,6 +1,6 @@
 import { EbankCard, EBLInput } from "./Ebank";
-import Form from "../Components/Form";
-import { TextAreaInput, SimpleInput } from "../Components/Input";
+import Form from "../Components/Form/Form";
+import { TextAreaInput, SimpleInput } from "../Components/Form/Input";
 import { useState, useContext } from "react";
 import { cfxContext, hostURL } from "../utils";
 

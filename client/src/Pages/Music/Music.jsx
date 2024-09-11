@@ -18,13 +18,13 @@ export default function Music() {
             return
         }
 
-        quickFetch('/get_my_playlists')
+        quickFetch('/music/get_my_playlists')
         .then(r => {
             setMyPlaylists([...r.created, ...r.added])
         })
         .catch(() => alert('Не удалось загрузить Ваши плейлисты!'))
 
-        quickFetch('/get_my_soundtracks')
+        quickFetch('/music/get_my_soundtracks')
         .then(r => {
             setMySoundtracks(r)
         })

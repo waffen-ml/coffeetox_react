@@ -32,7 +32,7 @@ export default function Poll({data}) {
             return
         }
 
-        quickFetch('/vote/' + optionId, {retract: retract? 1 : 0})
+        quickFetch('/polls/vote/' + optionId, {retract: retract? 1 : 0})
         .then(r => {
             if(!r.success)
                 throw Error()

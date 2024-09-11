@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { CheckboxInput } from "../Input"
+import { CheckboxInput } from "../Form/Input"
 
 export default function PlaylistDependencyChecklist({playlistNames}) {
 

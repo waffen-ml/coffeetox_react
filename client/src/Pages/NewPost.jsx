@@ -1,13 +1,11 @@
-import '../index.css'
-import Form from '../Components/Form'
-import { SimpleInput, TextAreaInput, FormattedTextInput, CheckboxInput, InputWrapper} from '../Components/Input'
+import Form from '../Components/Form/Form'
+import { SimpleInput, TextAreaInput, FormattedTextInput, CheckboxInput, InputWrapper} from '../Components/Form/Input'
 import { hostURL, jsonToFormData, trimMultilineText } from '../utils'
 import Post from '../Components/Post'
 import { useSearchParams } from "react-router-dom";
 import {Link, IconButton} from '@mui/material'
 import { useState, useEffect, useRef, useMemo } from 'react'
-import FormattedText from '../Components/FormattedText'
-import MyFileUploader from '../Components/MyFileUploader'
+import MyFileUploader from '../Components/Form/MyFileUploader'
 import { useFormContext, Controller, useController } from "react-hook-form"
 import ClearIcon from '@mui/icons-material/Clear';
 import Page from '../Components/Page'
@@ -200,7 +198,7 @@ export default function NewPost() {
 
         setFwdPost({loading:true})
 
-        fetch(hostURL('/post/json/' + fwdId), {credentials:'include'})
+        fetch(hostURL('/posts/post/json/' + fwdId), {credentials:'include'})
         .then(r => r.json())
         .then(post => {
             post.success = true
@@ -227,7 +225,7 @@ export default function NewPost() {
             plan_datetime: data.plan_datetime? new Date(data.plan_datetime).toISOString() : null
         }
 
-        return fetch(hostURL('new_post'), {
+        return fetch(hostURL('/posts/new_post'), {
             method: 'POST',
             body: jsonToFormData(toSend),
             credentials: 'include'

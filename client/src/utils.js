@@ -1,6 +1,6 @@
 import {createContext} from 'react'
 
-export const HOST = 'https://coffeetox.ru'//'http://localhost'////////////// // // //
+export const HOST = 'http://localhost' //'https://coffeetox.ru'//////////////// // // //
 
 export const cfxContext = createContext({
     inspectContent: () => {}
@@ -31,12 +31,12 @@ export const tagValidation = {
         message: 'Тег должен состоять из цифр, латинских букв и "_"'
     },
     validate: {
-        is_free: (val) => {
-            return quickFetch('/is_tag_free', {tag: val})
+        is_available: (val) => {
+            return quickFetch('/auth/is_tag_available/' + val)
             .then(r => {
                 if (!r.success)
                     throw Error('failed to check tag')
-                else if(!r.is_free)
+                else if(!r.is_available)
                     return 'Этот тег занят'
                 return true
             })
@@ -51,13 +51,32 @@ export const emailValidation = {
     pattern: {
         value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
         message: 'Недействительный адрес'
+    },
+    validate: {
+        is_available: (val) => {
+            return quickFetch('/auth/is_email_available/' + val)
+            .then(r => {
+                if (!r.success)
+                    throw Error()
+                else if(!r.is_available)
+                    return 'Невозможно использовать этот адрес'
+                return true
+            })
+            .catch(() => {
+                return 'Не удалось узнать, свободен ли этот адрес'
+            })
+        }
     }
 }
 
 export const passwordValidation = {
     minLength: {
-        value: 4,
-        message: 'Пароль должен быть не короче 4 символов'
+        value: 8,
+        message: 'Пароль должен быть не короче 8 символов'
+    },
+    maxLength: {
+        value: 100,
+        message: 'Превышен лимит в 100 символов'
     }
 }
 
@@ -196,16 +215,18 @@ export function isIterable(obj) {
     return typeof obj[Symbol.iterator] === 'function'
 }
 
-export const jsonToFormData = (data) => {
+export function jsonToFormData(data) {
     const fd = new FormData()
 
     Object.keys(data).forEach(k => {
-        if(Array.isArray(data[k])) {
-            data[k].forEach(w => fd.append(k, w))
+        if (Array.isArray(data[k])) {
+            console.log(data[k])
             return
         }
         else if(typeof data[k] === 'boolean')
             fd.append(k, data[k]? 1 : 0)
+        else if(typeof data[k] === null)
+            return
         else
             fd.append(k, data[k])
     })
@@ -331,13 +352,37 @@ export function quickFetch(url, params) {
     .then(r => r.json())
 }
 
+export function quickFetchPostFormData(url, json, fd) {
+    fd = fd ?? jsonToFormData(json)
+
+    return fetch(hostURL(url), {
+        method: 'POST',
+        credentials:'include',
+        body: fd
+    }).then(r => r.json())
+}
+
+export function quickFetchPostJSON(url, body) {
+    return fetch(hostURL(url), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials:'include',
+        body: JSON.stringify(body)
+    }).then(r => r.json())
+}
+
 export function loadUserData(tag) {
-    return quickFetch('/user/json/' + tag)
+    return quickFetch('/auth/user/json/' + tag)
     .then(data => {
         data.registration_date = new Date(data.registration_date)
         data.last_seen = new Date(data.last_seen)
 
         return data
+    })
+    .catch(() => {
+        return null
     })
 }
 
@@ -379,3 +424,38 @@ export function combineValidations(v1, v2) {
         validate
     }
 }
+
+export function prepareFormResult(r) {
+    if (!r)
+        return null
+
+    let alert = r.alert ?? {}
+
+    if (r.alertDefaultTitle)
+        alert.title = r.muiError? 'Ошибка!' : r.muiSuccess? 'Успех!' : null
+
+    if (r.alertTitle)
+        alert.title = r.alertTitle
+
+    if (r.muiError) {
+        alert.muiType = 'error'
+        alert.text = r.muiError
+    }
+    else if(r.muiInfo) {
+        alert.muiType = 'info'
+        alert.text = r.muiInfo
+    }
+    else if(r.muiSuccess) {
+        alert.muiType = 'success'
+        alert.text = r.muiSuccess
+    }
+
+    return {
+        ...r,
+        alert
+    }
+}
+
+
+
+

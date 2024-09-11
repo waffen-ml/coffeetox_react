@@ -1,4 +1,5 @@
-from coffeetox import db, app, cfx_config
+from coffeetox import db, app
+import config
 from flask import request, abort, session
 from uuid import uuid4
 from coffeetox.fs import save_file
@@ -156,8 +157,8 @@ def get_my_id():
     return None if not current_user.is_authenticated else current_user.id
 
 
-@app.route('/post/json/<string:post_id>')
-def get_post_json(post_id):
+@app.route('/posts/post/json/<string:post_id>')
+def route_get_post_json(post_id):
     post = Post.query.get(post_id)
 
     if post is None:
@@ -166,7 +167,7 @@ def get_post_json(post_id):
     return post.to_dict(me=current_user)
 
 
-@app.route('/new_post', methods=['POST'])
+@app.route('/posts/new_post', methods=['POST'])
 @login_required
 def route_new_post():
     title = request.form.get('title', '')[:150]
@@ -208,15 +209,15 @@ def route_new_post():
     return {'success': 1}
 
 
-@app.route('/all_posts')
-def get_all_posts():
+@app.route('/posts/all_posts')
+def route_get_all_posts():
     posts = Post.query.all()[::-1]
     return [p.to_dict(me=current_user) for p in posts]
 
 
-@app.route('/set_post_reaction')
+@app.route('/posts/set_post_reaction')
 @login_required
-def set_post_reaction():
+def route_set_post_reaction():
     reaction = request.args.get('reaction', None)
     post_id = request.args.get('post_id', None)
     post = None if post_id is None else Post.query.get(int(post_id))
@@ -230,9 +231,9 @@ def set_post_reaction():
 
     return {'success': 1}
 
-@app.route('/set_post_comment_reaction')
+@app.route('/posts/set_post_comment_reaction')
 @login_required
-def set_post_comment_reaction():
+def route_set_post_comment_reaction():
     reaction = request.args.get('reaction', None)
     comment_id = request.args.get('comment_id', None)
     post_comment = None if comment_id is None else PostComment.query.get(int(comment_id))
@@ -249,7 +250,7 @@ def set_post_comment_reaction():
     return {'success': 1}
 
 
-@app.route('/get_post_reactions/<int:post_id>')
+@app.route('/posts/get_post_reactions/<int:post_id>')
 def route_get_post_reactions(post_id):
     post = Post.query.get(post_id)
 
@@ -266,7 +267,7 @@ def route_get_post_reactions(post_id):
     }
 
 
-@app.route('/delete_post/<int:post_id>')
+@app.route('/posts/delete_post/<int:post_id>')
 def route_delete_post(post_id):
     post = Post.query.get(post_id)
 
@@ -281,19 +282,18 @@ def route_delete_post(post_id):
     return {
         'success': 1
     }
-    
 
 
-@app.route('/leave_comment', methods=['POST'])
+@app.route('/posts/leave_comment', methods=['POST'])
 @login_required
-def leave_comment():
+def route_leave_comment():
     data = request.json
     post = Post.query.get(int(data['post_id']))
 
     if post is None:
         return {'success': 0}
     
-    post_comment = PostComment(author_id=current_user.id, text=data.get('text', 'hey'))
+    post_comment = PostComment(author_id=current_user.id, text=data.get('text', ''))
     post.comments.append(post_comment)
 
     reply_to = None
@@ -312,9 +312,9 @@ def leave_comment():
     return {'success': 1, 'comment': post_comment.to_dict(me=current_user)}
 
 
-@app.route('/delete_post_comment')
+@app.route('/posts/delete_post_comment')
 @login_required
-def delete_post_comment():
+def route_delete_post_comment():
     comment_id = request.args.get('comment_id', None)
     post_comment = PostComment.query.get(int(comment_id))
 
@@ -330,8 +330,8 @@ def delete_post_comment():
     return {'success': 1}
 
 
-@app.route('/generate_feed')
-def generate_feed():
+@app.route('/posts/generate_feed')
+def route_generate_feed():
     sort = request.args.get('sort', 'TIME_ASC').upper()
     specific_user_only_id = request.args.get('specific_user_only', None)
     subscribed_only = int(request.args.get('subscribed_only', 0))
@@ -354,7 +354,7 @@ def generate_feed():
     }
 
     to_delete = sorted(session['feed'].items(),
-                       key=lambda x: x[1]['updated_at'], reverse=True)[cfx_config['feed_limit']:]
+                       key=lambda x: x[1]['updated_at'], reverse=True)[config.feed_limit:]
     
     for f in to_delete:
         del session['feed'][f[0]]
@@ -367,8 +367,8 @@ def generate_feed():
     }
 
 
-@app.route('/feed_batch/<string:feed_id>')
-def feed_batch(feed_id):
+@app.route('/posts/feed_batch/<string:feed_id>')
+def route_feed_batch(feed_id):
     amount = int(request.args.get('amount', 10))
 
     if 'feed' not in session or feed_id not in session['feed']:
@@ -418,3 +418,4 @@ def feed_batch(feed_id):
         'posts': [p.to_dict(me=current_user) for p in posts ],
         'current': feed['current']
     }
+

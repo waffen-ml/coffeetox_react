@@ -1,5 +1,5 @@
-import Form from '../../Components/Form'
-import { AvatarInput, SimpleInput, CheckboxInput } from '../../Components/Input'
+import Form from '../../Components/Form/Form'
+import { AvatarInput, SimpleInput, CheckboxInput } from '../../Components/Form/Input'
 import Page from '../../Components/Page'
 import {hostURL, jsonToFormData} from '../../utils'
 
@@ -26,7 +26,7 @@ export default function NewPlaylist() {
         if (data.cover)
             toSend.cover = data.cover
 
-        fetch(hostURL('create_playlist'), {
+        fetch(hostURL('/music/create_playlist'), {
             method: 'POST',
             credentials: 'include',
             body: jsonToFormData(toSend)

@@ -283,7 +283,7 @@ function PostStatsBar({nLikes, nDislikes, nViews, nReposts, nComments, myInitial
         if (silent) 
             return newReaction
 
-        fetch(hostURL(`/set_post_reaction?post_id=${postId}&reaction=${newReaction}`), {credentials:'include'})
+        fetch(hostURL(`/posts/set_post_reaction?post_id=${postId}&reaction=${newReaction}`), {credentials:'include'})
         .then(r => r.json())
         .then(r => {
             if(!r.success) throw Error()
@@ -645,7 +645,7 @@ function PostCommentSection({comments, focusOnCommentsRef}) {
             if(action.silent)
                 return w
             
-            fetch(hostURL(`/set_post_comment_reaction?reaction=${currentReaction}&comment_id=${action.postCommentId}`),
+            fetch(hostURL(`/posts/set_post_comment_reaction?reaction=${currentReaction}&comment_id=${action.postCommentId}`),
                 {credentials:'include'})
             .then(r => r.json())
             .then(r => {
@@ -677,7 +677,7 @@ function PostCommentSection({comments, focusOnCommentsRef}) {
         if(!currentUser || currentUser.id < 0 || !confirm('Удалить комментарий?'))
             return
 
-        fetch(hostURL('/delete_post_comment?comment_id=' + comment.id),
+        fetch(hostURL('/posts/delete_post_comment?comment_id=' + comment.id),
             {credentials:'include'})
         .then(r => r.json())
         .then(r => {
@@ -691,7 +691,7 @@ function PostCommentSection({comments, focusOnCommentsRef}) {
     }
 
     const submitComment = (text) => {
-        return fetch(hostURL('/leave_comment'), {
+        return fetch(hostURL('/posts/leave_comment'), {
             credentials:'include',
             headers: {
                 'Content-Type': 'application/json'
@@ -806,7 +806,7 @@ export default function Post({ data, isCompact}) {
 
 
     const showReactions = () => {
-        quickFetch('/get_post_reactions/' + data.id)
+        quickFetch('/posts/get_post_reactions/' + data.id)
         .then(r => {
             if(!r.success)
                 throw Error()
@@ -823,7 +823,7 @@ export default function Post({ data, isCompact}) {
         if(!currentUser || currentUser.id != data.author.id || !confirm('Подтвердите удаление'))
             return
 
-        quickFetch('/delete_post/' + data.id)
+        quickFetch('/posts/delete_post/' + data.id)
         .then(r => {
             if(!r.success)
                 throw Error()

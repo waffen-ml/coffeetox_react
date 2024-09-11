@@ -1,4 +1,5 @@
-from coffeetox import db, cfx_config, app, get_abspath
+from coffeetox import db, app, site_dir
+import config
 from flask import send_file, abort, request, Response, redirect
 import datetime
 import mimetypes
@@ -38,7 +39,7 @@ class File(db.Model):
     def path(self):
         if not self.id:
             return None
-        return get_abspath(cfx_config.user_files_folder, f'{self.id}.{self.extension}')
+        return os.path.join(site_dir, config.user_files_folder, f'{self.id}.{self.extension}')
     
     def to_dict(self):
         return {
@@ -51,23 +52,30 @@ class File(db.Model):
             'specifics': {} if self.specifics is None else json.loads(self.specifics)
         }
 
-    def delete_content(self):
+    def delete(self):
         os.remove(self.path)
+        db.session.delete(self)
+        db.session.commit()
+
+
+def react_app_dir(path):
+    return os.path.join(site_dir, config.react_app_folder, 'dist', path)
 
 
 def send_react_app():
-    return send_file(f'{cfx_config.built_react_app_folder}/index.html')
+    return send_file(react_app_dir('index.html'))
+
 
 # shortcut
 @app.route('/assets/<path:path_to_file>')
-def react_assets(path_to_file):
-    path = os.path.join(f'{cfx_config.built_react_app_folder}/assets', path_to_file)
+def route_react_assets(path_to_file):
+    path = react_app_dir('/assets/' + path_to_file)
     mimetype = 'text/javascript' if path_to_file.endswith('.js') else mimetypes.guess_type(path)[0]
     return send_file(path, mimetype=mimetype)
 
 
 @app.route('/file/<int:file_id>')
-def get_file(file_id):
+def route_get_file(file_id):
     file = File.query.get(file_id)
 
     if file is None or not os.path.exists(file.path):
@@ -109,16 +117,19 @@ def get_file(file_id):
 
     return resp
 
+
 def get_file_metadata(file_id):
     file = File.query.get(file_id)
     if not file:
         return None
     return file.to_dict()
 
+
 def get_file_content_length(file):
     l = file.stream.seek(0, os.SEEK_END)
     file.stream.seek(0)
     return l
+
 
 def get_specifics(file_db):
     try:
@@ -171,7 +182,6 @@ def get_specifics(file_db):
     return None
 
 
-
 def save_file(file, **kwargs):
 
     file_db = File(filename=file.filename,
@@ -181,8 +191,8 @@ def save_file(file, **kwargs):
     db.session.add(file_db)
     db.session.commit()
     
-    if not os.path.exists(get_abspath(cfx_config.user_files_folder)):
-        os.mkdir(get_abspath(cfx_config.user_files_folder))
+    if not os.path.exists(config.user_files_folder):
+        os.mkdir(config.user_files_folder)
 
     file.save(file_db.path)
 

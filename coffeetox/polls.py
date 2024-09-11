@@ -1,4 +1,4 @@
-from coffeetox import db, app, cfx_config
+from coffeetox import db, app
 from flask_login import login_required, current_user
 from flask import request
 from sqlalchemy.orm import backref
@@ -97,7 +97,7 @@ class Poll(db.Model):
         }
     
 
-@app.route('/vote/<int:option_id>')
+@app.route('/polls/vote/<int:option_id>')
 @login_required
 def route_vote(option_id):
     option = PollOption.query.get(option_id)
@@ -117,3 +117,5 @@ def route_vote(option_id):
     return {
         'success': 1
     }
+
+

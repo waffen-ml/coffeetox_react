@@ -36,6 +36,6 @@
     color:rgb(236, 224, 209);
 }
 
-:root.dark input {
+:root.dark input, :root.dark textarea {
     color:black;
 }

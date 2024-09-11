@@ -1,4 +1,5 @@
-from coffeetox import db, bcrypt, app, login_manager, cfx_config
+from coffeetox import db, bcrypt, app, login_manager, json_response, path_address
+import config
 from flask import request, abort
 from coffeetox.email import email_confirmation_manager
 import re
@@ -7,13 +8,16 @@ from flask_login import login_user, UserMixin, current_user, login_required, log
 from coffeetox.fs import save_file
 import secrets
 
+
 @login_manager.user_loader
 def load_user(user_id):
     u = User.query.get(int(user_id))
     return u
 
+
 class AnonymousUser(AnonymousUserMixin):
     id = None
+
 
 login_manager.anonymous_user = AnonymousUser
 
@@ -174,7 +178,24 @@ class User(db.Model, UserMixin):
         return bcrypt.check_password_hash(self.password_hash, plain_text_password)
 
 
-def is_tag_accessible_for(tag, user=AnonymousUser):
+def is_email_available_for(email, user=AnonymousUser):
+    if user.id is not None and user.email == email:
+        return True
+    
+    reg_edit_att = sum([
+        (c['type'] == 'register' or c['type'] == 'edit') and c['payload'].get('email') == email
+        for c in email_confirmation_manager.confirmations.values()
+    ])
+
+    existing_count = User.query.filter_by(email=email).count()
+
+    if reg_edit_att + existing_count >= config.max_accounts_per_email:
+        return False
+    
+    return True
+
+
+def is_tag_available_for(tag, user=AnonymousUser):
     if user.id is not None and user.tag == tag:
         return True
 
@@ -183,7 +204,12 @@ def is_tag_accessible_for(tag, user=AnonymousUser):
     if other_user is not None:
         return False
     
-    return not email_confirmation_manager.is_tag_about_to_be_registered(tag)
+    is_reg = any([
+        c['type'] == 'register' and c['payload'].get('tag') == tag
+        for c in email_confirmation_manager.confirmations.values()
+    ])
+    
+    return not is_reg
 
 
 def is_user_data_valid(**d):
@@ -199,31 +225,26 @@ def is_user_data_valid(**d):
     if tag is not None and ( \
         not (5 <= len(tag) <= 20) \
         or re.match('^[A-Za-z0-9_]*$', tag) is None \
-        or not is_tag_accessible_for(tag, for_user)
+        or not is_tag_available_for(tag, for_user)
     ):
         return False
     
-    if password is not None and len(password) < 4:
+    if password is not None and (len(password) < 8 or len(password) > 100):
         return False
 
-    if email is not None and not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+    if email is not None and (not re.match(r'[^@]+@[^@]+\.[^@]+', email) or not is_email_available_for(email, for_user)):
         return False
     
     return True
 
 
-def add_user(**kwargs):
-    user = User(**kwargs)
-    db.session.add(user)
-    db.session.commit()
-    return user
-
-def login_to_cfx(user):
+def login_with_params(user):
     login_user(user, remember=True, duration=datetime.timedelta(days=30))
 
 
-@app.route('/user/json/<string:tag>')
-def route_get_user_json(tag):
+# deprecated!
+@app.route('/auth/user/json/<string:tag>')
+def route_user_json(tag):
     user = User.query.filter_by(tag=tag).first()
 
     if user is None:
@@ -232,17 +253,221 @@ def route_get_user_json(tag):
     return user.to_dict()
 
 
-@app.route('/is_tag_free')
-def route_is_tag_free():
-    tag = request.args['tag']
+@app.route('/auth/user/<string:tag>')
+def route_user(tag):
+    user = User.query.filter_by(tag=tag).first()
 
-    return {
-        'success': 1,
-        'is_free': is_tag_accessible_for(tag, current_user)
+    if user is None:
+        return json_response(False, error='NOT_FOUND')
+
+    return json_response(True, user=user.to_dict())
+
+
+@app.route('/auth/is_tag_available/<string:tag>')
+def route_is_tag_available(tag):
+    return json_response(True, is_available=is_tag_available_for(tag, current_user))
+
+
+@app.route('/auth/is_email_available/<string:email>')
+def route_is_email_available(email):
+    return json_response(True, is_available=is_email_available_for(email, current_user))
+
+
+@app.route('/auth/register', methods=['POST'])
+def route_register():
+    data = request.json
+
+    if current_user.id is not None:
+        return json_response(False, error='ALREADY_AUTHORIZED')
+    
+    if not is_user_data_valid(**data):
+        return json_response(False, error='INVALID_DATA')
+
+    if not config.email_confirmation:
+
+        user = User(**data)
+        db.session.add(user)
+        db.session.commit()
+
+        login_with_params(user)
+
+        return json_response(True, confirmation=False)
+    
+    email_confirmation_manager.send(
+        data['email'],
+        'Завершение регистрации',
+        'Для подтверждения почты и завершения регистрации перейдите по ссылке ниже:\n\n' +
+        f'{path_address("/confirm_email/register/{key}")}\n\nЭта ссылка просрочится через {config.email_conf_lifetime_minutes} минут.',
+        data, 'register'
+    )
+
+    return json_response(True, confirmation=True)
+
+
+@app.route('/auth/login', methods=['POST'])
+def route_login():
+    data = request.json
+    user = User.query.filter_by(tag=data['tag']).first()
+
+    if current_user.id is not None:
+        return json_response(False, error='ALREADY_AUTHORIZED')
+
+    if user is None:
+        return json_response(False, error='USER_NOT_FOUND')
+
+    if not user.check_password(data['password']):
+        return json_response(False, error='INCORRECT_PASSWORD')
+    
+    login_with_params(user)
+
+    return json_response(True)
+
+
+@app.route('/auth/send_reset_password_email/<string:tag>')
+def route_send_reset_password_email(tag):
+    user = User.query.filter_by(tag=tag).first()
+
+    if user is None:
+        return json_response(False, error='USER_NOT_FOUND')
+    
+    payload = {
+        'user_id': user.id
     }
 
+    email_confirmation_manager.send(
+        user.email,
+        'Восстановление доступа',
+        'Для сброса пароля и восстановления доступа к аккаунту перейдите по ссылке ниже:\n\n' +
+        f'{path_address("/reset_password/{key}")}\n\nЭта ссылка просрочится через {config.email_conf_lifetime_minutes} минут.',
+        payload, 'reset_password'
+    )
 
-@app.route('/subscribe/<int:target_id>')
+    return json_response(True)
+
+
+@app.route('/auth/confirm_email/register/<string:key>')
+def route_confirm_email_register(key):
+    data = email_confirmation_manager.complete(key)
+
+    if data is None:
+        return json_response(False, error="INVALID_KEY")
+    
+    user = User(**data)
+    db.session.add(user)
+    db.session.commit()
+
+    login_with_params(user)
+
+    return json_response(True)
+
+
+@app.route('/auth/confirm_email/reset_password/<string:key>', methods=['POST'])
+def route_confirm_email_reset_password(key):
+    new_password = request.json.get('password')
+    payload = email_confirmation_manager.complete(key)
+
+    if payload is None:
+        return json_response(False, error='INVALID_KEY')
+    
+    user_id = payload.get('user_id')
+    user = User.query.get(user_id)
+
+    if user is None:
+        return json_response(False, error='USER_NOT_FOUND')
+    
+    if not is_user_data_valid(password=new_password):
+        return json_response(False, error='INVALID_DATA')
+
+    user.password = new_password
+    db.session.commit()
+
+    login_with_params(user)
+
+    return json_response(True)
+
+
+@app.route('/auth/confirm_email/edit/<string:key>')
+def route_confirm_email_edit(key):
+    payload = email_confirmation_manager.complete(key)
+
+    if payload is None:
+        return json_response(False, error='INVALID_KEY')
+    
+    user_id = payload.get('user_id')
+    new_email = payload.get('email')
+    user = User.query.get(user_id)
+
+    if user is None:
+        return json_response(False, error='USER_NOT_FOUND')
+    
+    if not is_user_data_valid(email=new_email, for_user=user):
+        return json_response(False, error='INVALID_DATA')
+
+    user.email = new_email
+    db.session.commit()
+
+    return json_response(True)
+
+
+@app.route('/auth/edit_account', methods=['POST'])
+@login_required
+def route_edit_account():
+    data = request.json
+
+    if not is_user_data_valid(
+        for_user=current_user,
+        username=data['username'],
+        tag=data['tag'],
+        email=data['email']
+    ):
+        return json_response(False, error='INVALID_DATA')
+    
+    current_user.username = data['username']
+    current_user.tag = data['tag']
+    current_user.bio = data['bio']
+    current_user.is_private = data['is_private']
+
+    if not current_user.is_private:
+        current_user.accept_all_subscription_requests()
+
+    db.session.commit()
+    
+    if current_user.email != data['email'] and config.email_confirmation:
+        email_confirmation_manager.send(
+            data['email'],
+            'Смена адреса электронной почты',
+            'Для смены адреса электронной почты перейдите по ссылке ниже:\n\n' +
+            f'{path_address("/confirm_email/edit/{key}")}\n\nЭта ссылка просрочится через {config.email_conf_lifetime_minutes} минут.',
+            {'user_id': current_user.id, 'email': data['email']}, 'edit'
+        )
+        return json_response(True, email_confirmation=True)
+    
+    current_user.email = data['email']
+    db.session.commit()
+
+    return json_response(True, email_confirmation=False)
+
+
+@app.route('/auth/change_password', methods=['POST'])
+@login_required
+def route_change_password():
+    old_password = request.json['old_password']
+    new_password = request.json['new_password']
+
+    if not is_user_data_valid(password=new_password):
+        return json_response(False, error='INVALID_DATA')
+    
+    if not current_user.check_password(old_password):
+        return json_response(False, error='INCORRECT_PASSWORD')
+    
+    current_user.password = new_password
+    db.session.commit()
+
+    return json_response(True)
+
+
+
+@app.route('/auth/subscribe/<int:target_id>')
 @login_required
 def route_subscribe(target_id):
     target = User.query.get(target_id)
@@ -274,7 +499,7 @@ def route_subscribe(target_id):
         }
 
 
-@app.route('/subscription_status/<int:target_id>')
+@app.route('/auth/subscription_status/<int:target_id>')
 @login_required
 def route_subscription_status(target_id):
     target = User.query.get(target_id)
@@ -300,7 +525,7 @@ def route_subscription_status(target_id):
     return output
 
 
-@app.route('/unsubscribe/<int:target_id>')
+@app.route('/auth/unsubscribe/<int:target_id>')
 @login_required
 def route_unsubscribe(target_id):
     target = User.query.get(target_id)
@@ -322,7 +547,7 @@ def route_unsubscribe(target_id):
     }
 
 
-@app.route('/resolve_incoming_request/<int:target_id>/<int:add>')
+@app.route('/auth/resolve_incoming_request/<int:target_id>/<int:add>')
 @login_required
 def route_resolve_incoming_request(target_id, add):
     target = User.query.get(target_id)
@@ -344,19 +569,19 @@ def route_resolve_incoming_request(target_id, add):
     }
 
 
-@app.route('/all_subscribers')
+@app.route('/auth/all_subscribers')
 @login_required
 def route_all_subscribers():
     return [u.to_dict() for u in current_user.subscribers]
 
 
-@app.route('/all_subscriptions')
+@app.route('/auth/all_subscriptions')
 @login_required
 def route_all_subscriptions():
     return [u.to_dict() for u in current_user.subscribed_to]
 
 
-@app.route('/all_subscription_requests')
+@app.route('/auth/all_subscription_requests')
 @login_required
 def route_all_subscription_requests():
     return {
@@ -364,7 +589,7 @@ def route_all_subscription_requests():
         'outgoing': [r.target.to_dict() for r in current_user.outgoing_subscription_requests],
     }
 
-@app.route('/delete_subscriber/<int:subscriber_id>')
+@app.route('/auth/delete_subscriber/<int:subscriber_id>')
 @login_required
 def route_delete_subscriber(subscriber_id):
 
@@ -386,45 +611,6 @@ def route_delete_subscriber(subscriber_id):
         'success': 1
     }
 
-@app.route('/edit_account', methods=['POST'])
-@login_required
-def route_edit_account():
-    data = request.json
-
-    if not is_user_data_valid(
-        for_user=current_user,
-        username=data['username'],
-        tag=data['tag'],
-        email=data['email']
-    ):
-        return {
-            'success': 0,
-            'error': 'INVALID_DATA'
-        }
-    
-    current_user.username = data['username']
-    current_user.tag = data['tag']
-    current_user.bio = data['bio']
-    current_user.is_private = data['is_private']
-
-    if not current_user.is_private:
-        current_user.accept_all_subscription_requests()
-
-    db.session.commit()
-    
-    if current_user.email != data['email'] and cfx_config['email_confirmation']:
-        return {
-            'success': 1,
-            'confirmation_key': email_confirmation_manager.send_confirmation(data['email'], {'email': data['email']}, 'edit')
-        }
-    
-    current_user.email = data['email']
-    db.session.commit()
-
-    return {
-        'success': 1,
-        'confirmation_key': None
-    }
 
 
 @app.before_request
@@ -433,127 +619,12 @@ def br_update_last_seen():
         return
     current_user.update_last_seen()
 
-@app.route('/change_password', methods=['POST'])
-@login_required
-def route_change_password():
-    old_password = request.json['old_password']
-    new_password = request.json['new_password']
-
-    if not is_user_data_valid(password=new_password) or not current_user.check_password(old_password):
-        return {
-            'success': 0,
-            'error': 'INVALID_DATA'
-        }
-    
-    current_user.password = new_password
-    db.session.commit()
-
-    return {
-        'success': 1
-    }
 
 
-@app.route('/reset_password')
-def route_reset_password():
-    tag = request.args.get('tag', '')
-    user = User.query.filter_by(tag=tag).first()
-
-    if user is None:
-        return {
-            'success': 0,
-            'error': 'INVALID_TAG'
-        }
-    
-    new_password = secrets.token_urlsafe(cfx_config['generated_password_length'])
-    
-    return {
-        'success': 1,
-        'confirmation_key': email_confirmation_manager.send_confirmation(
-            user.email, {'user_id': user.id, 'new_password': new_password}, 'password_reset')
-    }
 
 
-@app.route('/confirm_email', methods=['POST'])
-def route_confirm_email():
-    conf_key = request.json['confirmation_key']
-    conf_code = request.json['confirmation_code']
 
-    payload, type = email_confirmation_manager.complete_confirmation(conf_key, conf_code)
-    redirect_url = None
-
-    if payload is None:
-        return {
-            'success': 0,
-            'error': 'INVALID_CREDS'
-        }
-    elif type == 'register':
-        login_to_cfx(add_user(**payload))
-    elif type == 'edit' and current_user.id is not None:
-        current_user.email = payload['email']
-        db.session.commit()
-    elif type == 'password_reset':
-        user = User.query.get(payload['user_id'])
-        user.password = payload['new_password']
-        db.session.commit()
-        login_to_cfx(user)
-        redirect_url = '/reset_password_result?new_password=' + payload['new_password']
-    else:
-        return {
-            'success': 0
-        }
-
-    return {
-        'success': 1,
-        'redirect': redirect_url
-    }
-
-
-@app.route('/register', methods=['POST'])
-def route_register():
-    data = request.json
-    
-    if not is_user_data_valid(**data):
-        return {
-            'success': 0,
-            'error': 'INVALID_DATA'
-        }
-
-    if not cfx_config['email_confirmation']:
-
-        login_to_cfx(add_user(**data))
-
-        return {
-            'success': 1,
-            'confirmation': False,
-            'confirmation_key': None
-        }
-    
-    return {
-        'success': 1,
-        'confirmation': True,
-        'confirmation_key': email_confirmation_manager.send_confirmation(data['email'], data)
-    }
-
-
-@app.route('/login', methods=['POST'])
-def route_login():
-    data = request.json
-    user = User.query.filter_by(tag=data['tag']).first()
-
-    if user is None or not user.check_password(data['password']):
-        return {
-            'success': 0,
-            'error': 'INVALID_CREDS'
-        }
-    
-    login_to_cfx(user)
-
-    return {
-        'success': 1
-    }
-
-
-@app.route('/set_avatar', methods=['POST'])
+@app.route('/auth/set_avatar', methods=['POST'])
 def route_set_avatar():
     if not current_user.is_authenticated:
         return {'success': 0, 'error': 'NOT_AUTHENTICATED'}
@@ -565,12 +636,12 @@ def route_set_avatar():
     return {'success': 1}
 
 
-@app.route('/all_users')
+@app.route('/auth/all_users')
 def route_all_users():
     return [u.to_dict() for u in User.query.all()]
 
 
-@app.route('/who_am_i')
+@app.route('/auth/who_am_i')
 @login_required
 def route_who_am_i():
     return {
@@ -579,8 +650,9 @@ def route_who_am_i():
     }
 
 
-@app.route('/logout')
+@app.route('/auth/logout')
 @login_required
 def route_logout():
     logout_user()
     return {'success': 1}
+

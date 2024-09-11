@@ -1,6 +1,6 @@
 import { useContext } from 'react'
-import Form from '../Components/Form'
-import { RadioGroupInput } from '../Components/Input'
+import Form from '../Components/Form/Form'
+import { RadioGroupInput } from '../Components/Form/Input'
 import { cfxContext } from '../utils'
 import Page from '../Components/Page'
 

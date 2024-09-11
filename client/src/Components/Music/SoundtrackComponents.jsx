@@ -28,7 +28,7 @@ export function SoundtrackHeader({soundtrack, disableActions}) {
 
         if(!confirm('Вы уверены?')) return
 
-        quickFetch('/delete_soundtrack/' + soundtrack.id)
+        quickFetch('/music/delete_soundtrack/' + soundtrack.id)
         .then(r => {
             if(!r.success)
                 throw Error()
@@ -164,7 +164,7 @@ export function SoundtrackItem({soundtrack, onClick, actions, unavailableActions
 
 export function loadSoundtrack(id) {
     return new Promise(resolve => {
-        quickFetch('/get_soundtrack/' + id)
+        quickFetch('/music/get_soundtrack/' + id)
         .then(r => {
             if (r.error)
                 resolve({error: r.error})

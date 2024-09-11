@@ -2,8 +2,8 @@ import Page from '../Components/Page'
 import { CfxBox } from '../Components/CfxBaseComponents'
 import { useContext, useState, useEffect, useRef } from 'react'
 import { cfxContext, hostURL, quickFetch, labelEBL, fileURL, getPostDatetimeLabel, combineValidations} from '../utils'
-import Form from "../Components/Form"
-import { SimpleInput, NumericInput } from "../Components/Input"
+import Form from "../Components/Form/Form"
+import { SimpleInput, NumericInput } from "../Components/Form/Input"
 import { AvatarTagWidget } from '../Components/UserWidgets'
 import { Button, Link, Avatar, Pagination, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Tabs, Tab } from '@mui/material'
 import ClearIcon from '@mui/icons-material/Clear';
@@ -15,7 +15,7 @@ function AccountTagInput({name, label, placeholder, validation}) {
     const [foundUser, setFoundUser] = useState(null)
 
     const handleChange = (val) => {
-        quickFetch('/user/json/' + val)
+        quickFetch('/auth/user/json/' + val)
         .then(u => setFoundUser(u))
         .catch(() => setFoundUser(null))
     }
@@ -24,7 +24,7 @@ function AccountTagInput({name, label, placeholder, validation}) {
         if (w == "")
             return true
 
-        return quickFetch('/user/json/' + w)
+        return quickFetch('/auth/user/json/' + w)
             .then(() => true)
             .catch(() => "Не удалось найти пользователя!")
     }
@@ -47,9 +47,6 @@ function AccountTagInput({name, label, placeholder, validation}) {
             )}
         </>
     )
-
-
-
 
 }
 

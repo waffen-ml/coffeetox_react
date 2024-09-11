@@ -1,6 +1,6 @@
-import Form from '../../Components/Form'
-import { AvatarInput, SimpleInput, CheckboxInput, InputWrapper } from '../../Components/Input'
-import MyFileUploader from '../../Components/MyFileUploader'
+import Form from '../../Components/Form/Form.jsx'
+import { AvatarInput, SimpleInput, CheckboxInput, InputWrapper } from '../../Components/Form/Input'
+import MyFileUploader from '../../Components/Form/MyFileUploader'
 import Page from '../../Components/Page'
 import { Link } from '@mui/material'
 import {hostURL, jsonToFormData, quickFetch} from '../../utils'
@@ -72,7 +72,7 @@ export default function NewSoundtrack() {
     const [playlists, setPlaylists] = useState([])
     
     useEffect(() => {
-        quickFetch('/get_my_playlists')
+        quickFetch('/music/get_my_playlists')
         .then(pl => setPlaylists(pl.created))
         .catch(() => {
             alert('Не удалось загрузить Ваши плейлисты!')
@@ -99,7 +99,7 @@ export default function NewSoundtrack() {
         if (data.cover)
             toSend.cover = data.cover
 
-        fetch(hostURL('create_soundtrack'), {
+        fetch(hostURL('/music/create_soundtrack'), {
             method: 'POST',
             credentials: 'include',
             body: jsonToFormData(toSend)

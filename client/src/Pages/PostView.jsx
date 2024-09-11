@@ -9,7 +9,7 @@ export default function PostView() {
     const [postData, setPostData] = useState(null)
 
     useEffect(() => {
-        quickFetch('/post/json/' + id)
+        quickFetch('/posts/post/json/' + id)
         .then(r => setPostData(r))
         .catch(() => setPostData({error: true}))
     }, [])

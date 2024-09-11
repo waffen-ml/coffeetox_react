@@ -28,7 +28,7 @@ export default function User({}) {
         if(!currentUser || !userData || currentUser.id < 0 || currentUser.id == userData.id)
             return
         
-        quickFetch('/subscription_status/' + userData.id)
+        quickFetch('/auth/subscription_status/' + userData.id)
         .then(r => {
             setSubscribed(Boolean(r.subscribed))
             setSubscriptionRequested(Boolean(r.requested))
@@ -39,7 +39,7 @@ export default function User({}) {
 
     
     const handleSubscribe = () => {
-        quickFetch('/subscribe/' + userData.id)
+        quickFetch('/auth/subscribe/' + userData.id)
         .then(r => {
             if(!r.success)
                 return
@@ -57,7 +57,7 @@ export default function User({}) {
     }
 
     const handleUnsubscribe = () => {
-        quickFetch('/unsubscribe/' + userData.id)
+        quickFetch('/auth/unsubscribe/' + userData.id)
         .then(r => {
             if(!r.success)
                 return

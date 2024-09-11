@@ -4,10 +4,7 @@ import PostView from './Pages/PostView'
 import SiteSettings from './Pages/SiteSettings'
 import Home from './Pages/Home'
 import CFXStandsWithUA from './Pages/CFXStandsWithUA'
-import Register from './Pages/Register'
-import ConfirmEmail from './Pages/ConfirmEmail'
 import Capytaire from './Pages/Capytaire'
-import Login from './Pages/Login'
 import User from './Pages/User'
 import ListenST from './Pages/Music/ListenST'
 import NewSoundtrack from './Pages/Music/NewSoundtrack'
@@ -17,20 +14,22 @@ import Music from './Pages/Music/Music'
 import Ebank from './Pages/Ebank'
 import CardStyleDemo from './Pages/CardStyleDemo'
 import Subscriptions from './Pages/Subscriptions'
-import ResetPassword from './Pages/ResetPassword'
-import ResetPasswordResult from './Pages/ResetPasswordResult'
-import ChangePassword from './Pages/ChangePassword'
-import AccountSettings from './Pages/AccountSettings'
 import { cfxContext, hostURL, fileURL } from './utils'
 import { useEffect, useState, useRef} from 'react'
 import SetAvatar from './Pages/SetAvatar'
 import FormattedTextTest from './Pages/FormattedTextTest'
-import MyFileUploaderTest from './Pages/MyFileUploaderTest'
 import { AvatarTagWidget } from './Components/UserWidgets'
 import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Avatar, Link, Button, IconButton, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box} from '@mui/material'
 import {ThemeProvider, createTheme} from '@mui/material/styles'
+
+import ResetPassword from './Pages/Auth/ResetPassword'
+import ConfirmEmail from './Pages/Auth/ConfirmEmail'
+import Register from './Pages/Auth/Register'
+import Login from './Pages/Auth/Login'
+import AccountSettings from './Pages/Auth/AccountSettings'
+import ChangePassword from './Pages/Auth/ChangePassword'
 
 
 const DARK_THEME = createTheme({
@@ -61,7 +60,7 @@ export default function App() {
     const mainContentRef = useRef(null)
 
     const updateUserData = () => {
-        return fetch(hostURL('/who_am_i'), {credentials:'include'})
+        return fetch(hostURL('/auth/who_am_i'), {credentials:'include'})
         .then(r => r.json())
         .then(r => {
             if (!r.success)
@@ -76,7 +75,7 @@ export default function App() {
     }
 
     const logout = () => {
-        return fetch(hostURL('/logout'), {credentials: 'include'})
+        return fetch(hostURL('/auth/logout'), {credentials: 'include'})
         .then(r => r.json())
         .then(r => {
             if(!r.success)
@@ -150,22 +149,13 @@ export default function App() {
                     <Router>
                         <Routes>
                             <Route path="/user/:tag" element={<User/>} />
-                            <Route path="/register" element={<Register />} />
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/confirm_email/:confKey" element={<ConfirmEmail />} />
                             <Route path="/settings" element={<SiteSettings/>}/>
                             <Route exact path="/new_post" element={<NewPost />} />
                             <Route path="/post/:id" element={<PostView />} />
                             <Route exact path="/" element={<Home />} />
                             <Route path="/ua" element={<CFXStandsWithUA />} />
                             <Route path="/capytaire" element={<Capytaire nSuits={4} />} />
-                            <Route path="/set_avatar" element={<SetAvatar />} />
-                            <Route path="/change_password" element={<ChangePassword/>} />
-                            <Route path="/account_settings" element={<AccountSettings/>} />
                             <Route path="/ft_test" element={<FormattedTextTest/>} />
-                            <Route path="/fupl_test" element={<MyFileUploaderTest/>} />
-                            <Route path="/reset_password_start" element={<ResetPassword/>}/>
-                            <Route path="/reset_password_result" element={<ResetPasswordResult/>}/>
                             <Route path="/subscriptions" element={<Subscriptions/>}/>
                             <Route path="/ebank" element={<Ebank/>}/>
                             <Route path="/card_style_demo" element={<CardStyleDemo/>}/>
@@ -174,6 +164,14 @@ export default function App() {
                             <Route path="/new_pllt" element={<NewPlaylist/>}/>
                             <Route path="/listen_pllt/:id" element={<ListenPlaylist/>}/>
                             <Route path="/music" element={<Music/>}/>
+
+                            <Route path="/confirm_email/:action/:key" element={<ConfirmEmail/>}/>
+                            <Route path="/reset_password/:key" element={<ResetPassword/>}/>
+                            <Route path="/register" element={<Register />} />
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/account_settings" element={<AccountSettings/>} />
+                            <Route path="/change_password" element={<ChangePassword/>} />
+                            <Route path="/set_avatar" element={<SetAvatar />} />
 
                         </Routes>
                     </Router>

@@ -61,7 +61,7 @@ export function PlaylistItems({playlist, isLoopEnabled, deleteItem, onPlay, disa
         if (!currentUser || currentUser.id != playlist.creator.id)
             return
 
-        quickFetch(`/remove_soundtrack_from_playlist/${playlist.id}/${stId}`)
+        quickFetch(`/music/remove_soundtrack_from_playlist/${playlist.id}/${stId}`)
         .then(r => {
             if (!r.success)
                 throw Error()
@@ -181,7 +181,7 @@ export function PlaylistHeader({playlist, isLoopEnabled, setLoopEnabled, disable
     const [isAdded, setAddedStatus] = useState(null)
 
     useEffect(() => {
-        quickFetch('/is_playlist_added/' + playlist.id)
+        quickFetch('/music/is_playlist_added/' + playlist.id)
         .then(r => {
             if(!r.success)
                 throw Error()
@@ -196,7 +196,7 @@ export function PlaylistHeader({playlist, isLoopEnabled, setLoopEnabled, disable
         if(!confirm('Вы уверены?'))
             return
         
-        quickFetch(`/delete_playlist/${playlist.id}`)
+        quickFetch(`/music/delete_playlist/${playlist.id}`)
         .then(r => {
             if(!r.success)
                 throw Error()
@@ -206,7 +206,7 @@ export function PlaylistHeader({playlist, isLoopEnabled, setLoopEnabled, disable
     }
 
     const handleSubToggle = (state) => {
-        quickFetch(`/toggle_playlist_sub/${playlist.id}/${state? 1 : 0}`)
+        quickFetch(`/music/toggle_playlist_sub/${playlist.id}/${state? 1 : 0}`)
         .then(r => {
             if(!r.success)
                 throw Error()
@@ -271,7 +271,7 @@ export function PlaylistHeader({playlist, isLoopEnabled, setLoopEnabled, disable
 
 export function loadPlaylist(id, shuffle) {
     return new Promise((resolve) => {
-        quickFetch('/get_playlist/' + id, {shuffle: shuffle? 1 : 0})
+        quickFetch('/music/get_playlist/' + id, {shuffle: shuffle? 1 : 0})
         .then(r => {
             if (r.error)
                 resolve({error: r.error})

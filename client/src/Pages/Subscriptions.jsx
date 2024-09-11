@@ -17,7 +17,7 @@ export default function SubscriptionRequests() {
     const [mySubscriptions, setMySubscriptions] = useState([])
 
     useEffect(() => {
-        quickFetch('/all_subscription_requests')
+        quickFetch('/auth/all_subscription_requests')
         .then(r => {
             setRequests({
                 incoming: r.incoming,
@@ -28,17 +28,17 @@ export default function SubscriptionRequests() {
             alert('Ошибка загрузки запросов')
         })
 
-        quickFetch('/all_subscribers')
+        quickFetch('/auth/all_subscribers')
         .then(r => setMySubscribers(r))
         .catch(() => alert('Ошибка загрузки ваших подписчиков'))
 
-        quickFetch('/all_subscriptions')
+        quickFetch('/auth/all_subscriptions')
         .then(r => setMySubscriptions(r))
         .catch(() => alert('Ошибка загрузки ваших подписок'))
     }, [])
 
     const resolveIncomingRequest = (userId, add) => {
-        quickFetch(`/resolve_incoming_request/${userId}/${add? 1 : 0}`)
+        quickFetch(`/auth/resolve_incoming_request/${userId}/${add? 1 : 0}`)
         .then(r => {
             if (!r.success)
                 throw Error()
@@ -51,7 +51,7 @@ export default function SubscriptionRequests() {
     }
 
     const unsubscribe = (userId) => {
-        quickFetch('/unsubscribe/' + userId)
+        quickFetch('/auth/unsubscribe/' + userId)
         .then(r => {
             if (!r.success)
                 throw Error()
@@ -65,7 +65,7 @@ export default function SubscriptionRequests() {
     }
 
     const deleteSubscriber = (userId) => {
-        quickFetch('/delete_subscriber/' + userId)
+        quickFetch('/auth/delete_subscriber/' + userId)
         .then(r => {
             if (!r.success)
                 throw Error()

@@ -49,7 +49,7 @@ export default function SetAvatar() {
         const fd = new FormData()
         fd.append('avatar', file)
 
-        fetch(hostURL('set_avatar'), {
+        fetch(hostURL('/auth/set_avatar'), {
             method: 'POST', 
             credentials: 'include',
             body: fd

@@ -1,23 +1,23 @@
 from email.message import EmailMessage
 import ssl
 import smtplib
-import random
 import uuid
 import datetime
-from coffeetox import cfx_config
+import config
+
 
 def send_email(to_email, subject='', content=''):
     context = ssl.create_default_context()
     smtp = smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context)
-    smtp.login(cfx_config.email_sender, cfx_config.email_app_pw)
+    smtp.login(config.email_sender, config.email_app_pw)
 
     email = EmailMessage()
-    email['From'] = cfx_config.email_sender
+    email['From'] = config.email_sender
     email['To'] = to_email
     email['Subject'] = subject
     email.set_content(content)
     
-    smtp.sendmail(cfx_config.email_sender, to_email, email.as_string())
+    smtp.sendmail(config.email_sender, to_email, email.as_string())
 
     smtp.quit()
 
@@ -26,53 +26,35 @@ class EmailConfirmationManager:
     def __init__(self):
         self.confirmations = {}
 
-    def remove_old_confirmations(self):
+    def remove_old(self):
         now = datetime.datetime.now()
 
         for k, v in list(self.confirmations.items()):
-            if (now - v['datetime']).seconds / 60 > cfx_config.email_conf_lifetime_minutes:
+            if (now - v['datetime']).seconds / 60 > config.email_conf_lifetime_minutes:
                 del self.confirmations[k]
 
-    def send_confirmation(self, email_address, payload, type='register'):
-        confirmation_key = uuid.uuid4().hex
-        confirmation_code = random.randint(10**5, 10**6 - 1)
+    def send(self, email_address, subject, content, payload, type='register'):
+        key = uuid.uuid4().hex
 
         send_email(
             email_address,
-            subject='Подтверждение адреса почты',
-            content=f'Код подтверждения: {confirmation_code}\nПокажите его всем, кому сможете!\nОн просрочится через {cfx_config.email_conf_lifetime_minutes} минут.'
+            subject=subject,
+            content=content.format(key=key)
         )
 
-        self.confirmations[confirmation_key] = {
+        self.confirmations[key] = {
             'type': type,
-            'confirmation_code': confirmation_code,
             'payload': payload,
             'datetime': datetime.datetime.now()
         }
+
+    def complete(self, key):
+        self.remove_old()
+
+        if key not in self.confirmations:
+            return None
         
-        return confirmation_key
-
-    def complete_confirmation(self, key, code):
-        self.remove_old_confirmations()
-
-        if key in self.confirmations and str(self.confirmations[key]['confirmation_code']) == str(code):
-            payload = self.confirmations[key]['payload']
-            type = self.confirmations[key]['type']
-
-            self.confirmations.pop(key)
-
-            return payload, type
-        
-        return None, None
-
-    def is_tag_about_to_be_registered(self, tag):
-        self.remove_old_confirmations()
-
-        for k, v in list(self.confirmations.items()):
-            if v['type'] == 'register' and v['payload']['tag'] == tag:
-                return True
-            
-        return False
+        return self.confirmations.pop(key)['payload']
 
 
 email_confirmation_manager = EmailConfirmationManager()

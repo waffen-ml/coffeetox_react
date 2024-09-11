@@ -1,4 +1,5 @@
-from coffeetox import db, app, cfx_config, json_response
+from coffeetox import db, app, json_response
+import config
 from flask import request, abort, session
 from uuid import uuid4
 from coffeetox.auth import User
@@ -9,7 +10,7 @@ from yoomoney import Quickpay, Client
 import json
 
 
-yoomoney_client = Client(cfx_config.yoomoney_token)
+yoomoney_client = Client(config.yoomoney_token)
 awaiting_payment = {}
 
 
@@ -84,7 +85,7 @@ def accept_payments(watch_user_id):
         if user.id == watch_user_id:
             accepted_watched = True
         
-        transfer(None, user, oper.amount / cfx_config.ebl_to_roubles, 'Покупка EBL')
+        transfer(None, user, oper.amount / config.ebl_to_roubles, 'Покупка EBL')
 
     return accepted_watched
 
@@ -171,11 +172,11 @@ def route_buy_ebl(amount):
     awaiting_payment[request_uuid] = {'user_id': current_user.id, 'ebl_amount': amount}
 
     quickpay = Quickpay(
-        receiver=cfx_config.yoomoney_account_id,
+        receiver=config.yoomoney_account_id,
         quickpay_form="shop",
         targets=f'Купите {amount} EBL',
         paymentType="SB",
-        sum=amount * cfx_config.ebl_to_roubles,
+        sum=amount * config.ebl_to_roubles,
         label=request_uuid
     )
     
@@ -202,7 +203,7 @@ def route_gimme(amount):
 @app.route('/ebank/ebl_to_roubles')
 def route_ebl_to_roubles():
     return {
-        'coef': cfx_config.ebl_to_roubles
+        'coef': config.ebl_to_roubles
     }
 
 @app.route('/ebank/check_payments')

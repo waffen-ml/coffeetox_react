@@ -15,7 +15,7 @@ export default function Feed({ sort, subscribedOnly, specificUserOnly}) {
         if(!feedId || !hasMore)
             return
 
-        return quickFetch('/feed_batch/' + feedId, {amount})
+        return quickFetch('/posts/feed_batch/' + feedId, {amount})
         .then(r => {
             if(!r.success)
                 throw Error()
@@ -43,7 +43,7 @@ export default function Feed({ sort, subscribedOnly, specificUserOnly}) {
             specific_user_only: specificUserOnly
         }
 
-        quickFetch('generate_feed', params)
+        quickFetch('/posts/generate_feed', params)
         .then(r => {
             if(!r.success)
                 throw Error()

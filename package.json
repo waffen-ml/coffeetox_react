@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "react-image-crop": "^11.0.6",
-    "react-infinite-scroller": "^1.2.6",
-    "react-photoswipe-gallery": "^3.0.2"
-  }
-}

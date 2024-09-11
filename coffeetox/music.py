@@ -146,7 +146,7 @@ class Playlist(db.Model):
 
 
 
-@app.route('/create_soundtrack', methods=['POST'])
+@app.route('/music/create_soundtrack', methods=['POST'])
 @login_required
 def route_create_soundtrack():
     name = request.form.get('name', '')[:100]
@@ -188,7 +188,7 @@ def route_create_soundtrack():
     }
 
 
-@app.route('/create_playlist', methods=['POST'])
+@app.route('/music/create_playlist', methods=['POST'])
 @login_required
 def route_create_playlist():
     name = request.form.get('name', '')[:100]
@@ -209,7 +209,7 @@ def route_create_playlist():
     }
 
 
-@app.route('/get_my_soundtracks')
+@app.route('/music/get_my_soundtracks')
 @login_required
 def route_get_my_soundtracks():
     return [
@@ -217,7 +217,7 @@ def route_get_my_soundtracks():
         if st.is_available(me=current_user)
     ]
 
-@app.route('/get_my_playlists')
+@app.route('/music/get_my_playlists')
 @login_required
 def route_get_my_playlists():
     return {
@@ -226,7 +226,7 @@ def route_get_my_playlists():
     }
 
 
-@app.route('/get_soundtrack/<int:st_id>')
+@app.route('/music/get_soundtrack/<int:st_id>')
 def route_get_soundtrack(st_id):
     st = Soundtrack.query.get(st_id)
 
@@ -248,7 +248,7 @@ def route_get_soundtrack(st_id):
     }
 
 
-@app.route('/get_playlist/<int:pllt_id>')
+@app.route('/music/get_playlist/<int:pllt_id>')
 def route_get_playlist(pllt_id):
     pllt = Playlist.query.get(pllt_id)
     shuffle = int(request.args.get('shuffle', 0))
@@ -271,7 +271,7 @@ def route_get_playlist(pllt_id):
     }
 
 
-@app.route('/remove_soundtrack_from_playlist/<int:pllt_id>/<int:st_id>')
+@app.route('/music/remove_soundtrack_from_playlist/<int:pllt_id>/<int:st_id>')
 @login_required
 def route_remove_soundtrack_from_playlist(pllt_id, st_id):
     pllt = Playlist.query.get(pllt_id)
@@ -296,7 +296,7 @@ def route_remove_soundtrack_from_playlist(pllt_id, st_id):
     }
 
 
-@app.route('/delete_playlist/<int:pllt_id>')
+@app.route('/music/delete_playlist/<int:pllt_id>')
 @login_required
 def route_delete_playlist(pllt_id):
     pllt = Playlist.query.get(pllt_id)
@@ -319,7 +319,7 @@ def route_delete_playlist(pllt_id):
     }
 
 
-@app.route('/route_get_pllts_dependency_table/<int:st_id>')
+@app.route('/music/route_get_pllts_dependency_table/<int:st_id>')
 @login_required
 def route_get_pllts_dependency_table(st_id):
     soundtrack = Soundtrack.query.get(st_id)
@@ -345,7 +345,7 @@ def route_get_pllts_dependency_table(st_id):
     }
 
 
-@app.route('/submit_pllts_dependency_table/<int:st_id>', methods=['POST'])
+@app.route('/music/submit_pllts_dependency_table/<int:st_id>', methods=['POST'])
 @login_required
 def route_submit_pllts_dependency_table(st_id):
     soundtrack = Soundtrack.query.get(st_id)
@@ -368,7 +368,7 @@ def route_submit_pllts_dependency_table(st_id):
     }
 
 
-@app.route('/delete_soundtrack/<int:st_id>')
+@app.route('/music/delete_soundtrack/<int:st_id>')
 @login_required
 def route_delete_soundtrack(st_id):
     soundtrack = Soundtrack.query.get(st_id)
@@ -391,7 +391,7 @@ def route_delete_soundtrack(st_id):
     }
 
 
-@app.route('/is_playlist_added/<int:pllt_id>')
+@app.route('/music/is_playlist_added/<int:pllt_id>')
 @login_required
 def route_is_playlist_added(pllt_id):
     pllt = Playlist.query.get(pllt_id)
@@ -408,7 +408,7 @@ def route_is_playlist_added(pllt_id):
     }
 
 
-@app.route('/toggle_playlist_sub/<int:pllt_id>/<int:state>')
+@app.route('/music/toggle_playlist_sub/<int:pllt_id>/<int:state>')
 @login_required
 def route_toggle_playlist_sub(pllt_id, state):
     pllt = Playlist.query.get(pllt_id)

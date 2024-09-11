@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef} from "react"
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material"
 import PlaylistDependencyChecklist from './PlaylistDependencyChecklist'
-import Form from '../Form'
+import Form from '../Form/Form'
 import { hostURL, quickFetch } from "../../utils"
 
 export default function PlaylistDependencyDialog({soundtrackId, onClose}) {
@@ -17,7 +17,7 @@ export default function PlaylistDependencyDialog({soundtrackId, onClose}) {
 
         setData({loading: true})
         
-        quickFetch('/route_get_pllts_dependency_table/' + soundtrackId)
+        quickFetch('/music/route_get_pllts_dependency_table/' + soundtrackId)
         .then(r => {
             if(!r.success)
                 throw Error()
@@ -41,7 +41,7 @@ export default function PlaylistDependencyDialog({soundtrackId, onClose}) {
             result[data.table[i].id.toString()] = state
         })
 
-        fetch(hostURL('/submit_pllts_dependency_table/' + soundtrackId), {
+        fetch(hostURL('/music/submit_pllts_dependency_table/' + soundtrackId), {
             method: 'POST',
             credentials: 'include',
             body: JSON.stringify({
