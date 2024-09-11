@@ -190,13 +190,12 @@ def save_file(file, **kwargs):
     
     db.session.add(file_db)
     db.session.commit()
-    
-    if not os.path.exists(config.user_files_folder):
-        os.mkdir(config.user_files_folder)
+
+    user_files_folder_path = os.path.join(site_dir, config.user_files_folder)
+    if not os.path.exists(user_files_folder_path):
+        os.mkdir(user_files_folder_path)
 
     file.save(file_db.path)
-
-    print(file_db.path)
 
     specifics = get_specifics(file_db)
 
