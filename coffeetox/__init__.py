@@ -11,7 +11,7 @@ app = Flask(__name__, static_folder=os.path.join(os.getcwd(), 'static'))
 app.app_context().push()
 
 site_dir = os.getcwd()
-site_address = 'http://127.0.0.1:80'
+site_address = 'https://coffeetox.ru'
 json_response = lambda success, **kwargs: \
     kwargs if success is None else {'success': success, **kwargs}
 path_address = lambda path: site_address + ('/' if path[0] != '/' else '') + path

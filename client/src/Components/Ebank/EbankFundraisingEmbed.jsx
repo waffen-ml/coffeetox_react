@@ -71,6 +71,9 @@ export default function EbankFundraisingEmbed({id}) {
             }
         })
     } 
+    
+    //console.log(data)
+    //console.log((data.fundraising.goal - data.fundraising.raised).toFixed(2))
 
     return (
         <CfxBox className="flex flex-col gap-1">
@@ -108,7 +111,7 @@ export default function EbankFundraisingEmbed({id}) {
                         <Form
                             submitButtonLabel="Перевести"
                             onSubmit={handleSubmit}
-                            defaultValues={{amount: (data.fundraising.goal - data.fundraising.raised).toPrecision(2)}}
+                            defaultValues={{amount: (data.fundraising.goal - data.fundraising.raised).toFixed(2)}}
                         >
                             <EBLInput
                                 name="amount"

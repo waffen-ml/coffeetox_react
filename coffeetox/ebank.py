@@ -78,7 +78,7 @@ class EbankFundraising(db.Model):
 
     @property
     def remain(self):
-        return self.goal - self.raised
+        return round(self.goal - self.raised, 2)
 
     def to_dict(self):
         return {
@@ -120,6 +120,8 @@ def transfer(from_user, to_user, amount, comment=''):
         return 'INVALID_AMOUNT'
     elif from_user is not None and from_user.balance < amount:
         return 'INSUFFICIENT_BALANCE'
+    elif from_user == to_user:
+        return 'SAME_USER'
     
     transaction = Transaction(from_user=from_user, to_user=to_user,
                               amount=amount, comment=comment)
