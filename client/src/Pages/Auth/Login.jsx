@@ -6,7 +6,7 @@ import Page from '../../Components/Page'
 
 export default function Login() {
     const methodsRef = useRef(null)
-    const [emailSent, setEmailSent] = useState(false)
+    const [resetBlocked, setResetBlocked] = useState(false)
     
     const onSubmit = (data) => {
         return quickFetchPostJSON('/auth/login', data)
@@ -37,11 +37,11 @@ export default function Login() {
         })
     }
 
-    const handleResetPassword = async () => {
+    const handleResetPassword = () => {
         if(!methodsRef.current)
             return
 
-        if (emailSent) {
+        if (resetBlocked) {
             methodsRef.current.setResult({
                 muiError: 'Письмо для восстановления доступа уже было отправлено.',
                 alertDefaultTitle: true
@@ -54,21 +54,20 @@ export default function Login() {
         })
 
         const tag = methodsRef.current.getValues('tag')
-        const user = await loadUserData(tag)
 
-        if (!user) {
-            methodsRef.current.setResult({
-                muiError: 'Невозможно восстановить доступ, так как аккаунт не найден.',
-                alertDefaultTitle: true
-            })
-            return
-        }
-
-        setEmailSent(true)
+        setResetBlocked(true)
 
         quickFetch('/auth/send_reset_password_email/' + tag)
         .then(r => {
-            if (r.error)
+            if (r.error == 'USER_NOT_FOUND') {
+                methodsRef.current.setResult({
+                    muiError: 'Пользователя с таким тэгом не найдено!',
+                    alertDefaultTitle: true
+                })
+                setResetBlocked(false)
+                return
+            }
+            else if (r.error)
                 throw Error()
             
             methodsRef.current.setResult({
@@ -81,7 +80,7 @@ export default function Login() {
                 muiError: 'Не удалось отправить Вам письмо для восстановления доступа.',
                 alertDefaultTitle: true
             })
-            setEmailSent(false)
+            setResetBlocked(false)
         })
     }
     

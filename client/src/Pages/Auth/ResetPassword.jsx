@@ -16,7 +16,7 @@ export default function ResetPassword() {
             password: data.password
         }
 
-        return quickFetchPostJSON('/auth/confirm_email/reset_password/' + key, toSend)
+        return quickFetchPostJSON('/auth/reset_password/' + key, toSend)
         .then(r => {
             if (r.error) {
                 return {
@@ -44,7 +44,6 @@ export default function ResetPassword() {
             }
         })
     }
-
     
     return (
         <Page title="Восстановить доступ">

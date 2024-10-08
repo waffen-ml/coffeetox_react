@@ -284,7 +284,6 @@ def route_register():
         return json_response(False, error='INVALID_DATA')
 
     if not config.email_confirmation:
-
         user = User(**data)
         db.session.add(user)
         db.session.commit()
@@ -345,23 +344,7 @@ def route_send_reset_password_email(tag):
     return json_response(True)
 
 
-@app.route('/auth/confirm_email/register/<string:key>')
-def route_confirm_email_register(key):
-    data = email_confirmation_manager.complete(key)
-
-    if data is None:
-        return json_response(False, error="INVALID_KEY")
-    
-    user = User(**data)
-    db.session.add(user)
-    db.session.commit()
-
-    login_with_params(user)
-
-    return json_response(True)
-
-
-@app.route('/auth/confirm_email/reset_password/<string:key>', methods=['POST'])
+@app.route('/auth/reset_password/<string:key>', methods=['POST'])
 def route_confirm_email_reset_password(key):
     new_password = request.json.get('password')
     payload = email_confirmation_manager.complete(key)
@@ -386,6 +369,22 @@ def route_confirm_email_reset_password(key):
     return json_response(True)
 
 
+@app.route('/auth/confirm_email/register/<string:key>')
+def route_confirm_email_register(key):
+    data = email_confirmation_manager.complete(key)
+
+    if data is None:
+        return json_response(False, error="INVALID_KEY")
+    
+    user = User(**data)
+    db.session.add(user)
+    db.session.commit()
+
+    login_with_params(user)
+
+    return json_response(True)
+
+
 @app.route('/auth/confirm_email/edit/<string:key>')
 def route_confirm_email_edit(key):
     payload = email_confirmation_manager.complete(key)
@@ -399,9 +398,6 @@ def route_confirm_email_edit(key):
 
     if user is None:
         return json_response(False, error='USER_NOT_FOUND')
-    
-    if not is_user_data_valid(email=new_email, for_user=user):
-        return json_response(False, error='INVALID_DATA')
 
     user.email = new_email
     db.session.commit()
