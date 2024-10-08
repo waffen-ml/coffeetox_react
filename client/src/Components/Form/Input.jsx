@@ -5,6 +5,7 @@ import FormattedText from "../FormattedText"
 import Cropper from 'react-easy-crop'
 import { findInputError, isFormInvalid, blobToBase64, cropImageSrc, dataURLtoFile, trimMultilineText, humanFileSize, quickFetch, combineValidations} from "../../utils"
 import {CfxBox} from '../CfxBaseComponents'
+import { AvatarTagWidget } from "../UserWidgets"
 
 
 export const CheckboxInput = ({name, label}) => {
